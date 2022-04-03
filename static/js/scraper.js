@@ -1,8 +1,10 @@
 function initScraper() {
     $("button#scrape-button").on("click", function (e) {
-        console.log("button clicked");
         $.get("/scraper/data", function(data, status) {
             console.log(data);
         })
+    });
+    $("button#test-db-button").on("click", async function (e) {
+        await testIdb();
     });
 }
