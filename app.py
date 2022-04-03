@@ -16,7 +16,8 @@ def scraper():
 
 @app.route("/scraper/data")
 def scrape_teams():
-    return scrape_league()
+    year = 2022
+    return scrape_league(year)
 
 if __name__ == "__main__":
     app.run(debug=True)
