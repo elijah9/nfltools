@@ -12,3 +12,17 @@ def scrape_player(row_soup, team_code, year):
     experience = row_soup.select('td[data-stat="experience"]')[0].text
     av_rating = row_soup.select('td[data-stat="av"]')[0].text
     print(f"{team_code} - {position} #{jersey_number} - {first_name} {last_name} - {height} {weight} - {college} - {birth_date} ({experience}) - {year} AV: {av_rating}")
+
+    return {
+        "teamCode": team_code,
+        "lastName": last_name,
+        "firstName": first_name,
+        "jerseyNumber": jersey_number,
+        "position": position,
+        "height": height,
+        "weight": weight,
+        "college": college,
+        "birthDate": birth_date,
+        "experience": experience,
+        "avRating": av_rating
+    }

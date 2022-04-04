@@ -1,7 +1,6 @@
 const TABLE_NAMES = {
     team: "team",
-    player: "player",
-    playerRoster: "playerRoster"
+    player: "player"
 };
 
 const _transactionTypes = {
@@ -12,8 +11,11 @@ const _transactionTypes = {
 const _dbName = "nfltools";
 
 function resetDb() {
-    window.indexedDB.deleteDatabase(_dbName);
-    initDb();
+    let deleteRequest = indexedDB.deleteDatabase(_dbName);
+    deleteRequest.onsuccess = function() {
+        console.log("deleted successfully?");
+        initDb();
+    };
 }
 
 function openDb(callback) {
@@ -28,6 +30,16 @@ function writeToStore(tableName, data) {
         let transaction = db.transaction(tableName, _transactionTypes.write);
         let objectStore = transaction.objectStore(tableName);
         objectStore.add(data);
+    });
+}
+
+function writeAllToStore(tableName, data) {
+    openDb(function(db) {
+        let transaction = db.transaction(tableName, _transactionTypes.write);
+        let objectStore = transaction.objectStore(tableName);
+        for(let i = 0; i < data.length; ++i) {
+            objectStore.add(data[i]);
+        }
     });
 }
 
@@ -65,9 +77,6 @@ function initDb() {
         }
         if (!db.objectStoreNames.contains(TABLE_NAMES.player)) {
             db.createObjectStore(TABLE_NAMES.player, { keyPath: "playerId", autoIncrement: true });
-        }
-        if (!db.objectStoreNames.contains(TABLE_NAMES.playerRoster)) {
-            db.createObjectStore(TABLE_NAMES.playerRoster, { keyPath: "playerRosterId", autoIncrement: true });
         }
     };
 }
