@@ -6,9 +6,46 @@
 
 {% block content %}
     <h1>{{title}}</h1>
-    <button type="button" class="btn btn-dark" id="scrape-button">scrape</button>
-    <button type="button" class="btn btn-dark" id="reset-db-button">reset db</button>
-    <button type="button" class="btn btn-dark" id="print-db-button">print db to browser console</button>
+
+    <div id="scraper-buttons" class="outline">
+        <button type="button" class="btn btn-dark" id="scrape-button">scrape</button>
+        <button type="button" class="btn btn-dark" id="reset-db-button">reset db</button>
+    </div>
+
+    <div class="outline auto-width margin-top">
+        <table id="roster-table" class="table table-light table-striped table-hover table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">Team</th>
+                    <th scope="col">Pos.</th>
+                    <th scope="col">#</th>
+                    <th scope="col">Last</th>
+                    <th scope="col">First</th>
+                    <th scope="col">Height</th>
+                    <th scope="col">Weight</th>
+                    <th scope="col">College</th>
+                    <th scope="col">Exp.</th>
+                    <th scope="col">DOB</th>
+                </tr>
+            </thead>
+            <tbody id="roster-table-data">
+
+            </tbody>
+        </table>
+
+        <div id="loading-indicator" class="margin-top hidden">
+            <div class="tbl">
+                <div class="spinner-border tbl-cell" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div id="loading-text" class="tbl-cell">
+                    chill for a second...
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
 {% endblock %}
 
 {% block scripts %}

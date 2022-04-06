@@ -10,73 +10,20 @@ const _transactionTypes = {
 
 const _dbName = "nfltools";
 
-function resetDb() {
-    let deleteRequest = indexedDB.deleteDatabase(_dbName);
-    deleteRequest.onsuccess = function() {
-        console.log("deleted successfully?");
-        initDb();
-    };
+async function resetDb() {
+    let db = new Localbase(_dbName);
+    await db.delete();
 }
 
-function openDb(callback) {
-    let openRequest = indexedDB.open(_dbName, 1);
-    openRequest.onsuccess = function() {
-        callback(openRequest.result);
+async function getAllFromTable(tableName) {
+    let db = new Localbase(_dbName);
+    let data = await db.collection(tableName).get();
+    return data;
+}
+
+async function writeAllToTable(tableName, data) {
+    let db = new Localbase(_dbName);
+    for(let i = 0; i < data.length; ++i) {
+        await db.collection(tableName).add(data[i]);
     }
-}
-
-function writeToStore(tableName, data) {
-    openDb(function(db) {
-        let transaction = db.transaction(tableName, _transactionTypes.write);
-        let objectStore = transaction.objectStore(tableName);
-        objectStore.add(data);
-    });
-}
-
-function writeAllToStore(tableName, data) {
-    openDb(function(db) {
-        let transaction = db.transaction(tableName, _transactionTypes.write);
-        let objectStore = transaction.objectStore(tableName);
-        for(let i = 0; i < data.length; ++i) {
-            objectStore.add(data[i]);
-        }
-    });
-}
-
-function deleteFromStore(tableName, key) {
-    openDb(function(db) {
-        let transaction = db.transaction(tableName, _transactionTypes.write);
-        let objectStore = transaction.objectStore(tableName);
-        objectStore.delete(key);
-    });
-}
-
-function readAllFromStore(tableName, callback) {
-    openDb(function(db) {
-        let transaction = db.transaction(tableName, _transactionTypes.read);
-        let objectStore = transaction.objectStore(tableName);
-        let getAllRequest = objectStore.getAll();
-        getAllRequest.onsuccess = function() {
-            callback(getAllRequest.result);
-        }
-    });
-}
-
-function initDb() {
-    if (!window.indexedDB) {
-        throw new Error("IndexedDB isn't working :/");
-    }
-
-    let openRequest = indexedDB.open(_dbName, 1);
-    openRequest.onupgradeneeded = function() {
-        let db = openRequest.result;
-        
-        // create object stores
-        if (!db.objectStoreNames.contains(TABLE_NAMES.team)) {
-            db.createObjectStore(TABLE_NAMES.team, { keyPath: "teamId", autoIncrement: true });
-        }
-        if (!db.objectStoreNames.contains(TABLE_NAMES.player)) {
-            db.createObjectStore(TABLE_NAMES.player, { keyPath: "playerId", autoIncrement: true });
-        }
-    };
 }

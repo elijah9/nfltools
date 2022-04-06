@@ -3,7 +3,6 @@
 Flask app which ideally should replace everything I currently do in a spreadsheet to keep track of football stuff. Mostly a vehicle for me to have a code project to work on in my spare time.
 
 ## To do
-- Store scraped data in IndexedDB
 - Implement view for scraped data
 - JSON export of data
 - JSON import of data

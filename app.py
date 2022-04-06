@@ -2,6 +2,7 @@ from flask import Flask, render_template
 from scraping.league_scraper import scrape_league
 
 app = Flask(__name__)
+app.templates_auto_reload = True
 
 @app.route("/home")
 @app.route("/")

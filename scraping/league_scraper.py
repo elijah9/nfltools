@@ -23,7 +23,6 @@ def scrape_league(year):
         for player in team_players:
             all_players.append(player)
 
-
     return {
         "teams": all_teams,
         "players": all_players

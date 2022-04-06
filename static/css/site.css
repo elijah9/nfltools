@@ -1,3 +1,37 @@
 div#body-content {
     margin: 20px 150px 0px 150px;
 }
+
+.outline {
+    padding: 1rem;
+    border: 0.1rem solid black;
+    border-radius: 1rem;
+    width: fit-content;
+}
+
+.hidden {
+    display: none;
+}
+
+.margin-top {
+    margin-top: 1rem; 
+}
+
+.tbl {
+    display: table;
+    overflow: hidden;
+    border-spacing: 0.75rem;
+}
+
+.tbl-cell {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.br-light {
+    background-color: aliceblue;
+}
+
+.auto-width {
+    width: auto;
+}
