@@ -6,6 +6,10 @@ Flask app which ideally should replace everything I currently do in a spreadshee
 - Implement view for scraped data
 - JSON export of data
 - JSON import of data
+- Formalize table structure
+- Clean scraped data
+- Interface for editing player info
+- Web hosting (https://www.pythonanywhere.com/ maybe)
 
 ## Ideas
 ### Scraping

@@ -19,19 +19,19 @@
     </div>
 
     <div class="outline auto-width margin-top">
-        <table id="roster-table" class="table table-light table-striped table-hover table-sm">
+        <table id="roster-table" class="table table-light table-striped table-hover table-sm table-sortable">
             <thead>
                 <tr>
                     <th scope="col">Team</th>
                     <th scope="col">Pos.</th>
-                    <th scope="col">#</th>
+                    <th scope="col" data-col-type="int">#</th>
                     <th scope="col">Last</th>
                     <th scope="col">First</th>
-                    <th scope="col">Height</th>
-                    <th scope="col">Weight</th>
+                    <th scope="col" data-col-type="height">Height</th>
+                    <th scope="col" data-col-type="int">Weight</th>
                     <th scope="col">College</th>
-                    <th scope="col">Exp.</th>
-                    <th scope="col">DOB</th>
+                    <th scope="col" data-col-type="int">Exp.</th>
+                    <th scope="col" data-col-type="date">DOB</th>
                 </tr>
             </thead>
             <tbody id="roster-table-data"></tbody>
