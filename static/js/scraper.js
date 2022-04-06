@@ -1,5 +1,5 @@
 async function initScraper() {
-    await resetPlayersTable();
+    await resetScrapedData();
 
     document.getElementById("scraper-buttons").style.display = "block";
 
@@ -8,17 +8,61 @@ async function initScraper() {
         $.get("/scraper/data", async function(data, status) {
             await writeAllToTable(TABLE_NAMES.team, data.teams);
             await writeAllToTable(TABLE_NAMES.player, data.players);
-            await resetPlayersTable();
+            await resetScrapedData();
             document.getElementById("loading-indicator").style.display = "none";
         })
     });
 
     $("button#reset-db-button").on("click", async function (e) {
-        console.log("clicked reset button");
         document.getElementById("loading-indicator").style.display = "table";
         await resetDb();
         location.reload();
     });
+
+    let teamsFilter = $("#teams-filter");
+    teamsFilter.on("change", function () {
+        document.getElementById("roster-table").style.display = "none";
+        document.getElementById("loading-indicator").style.display = "table";
+
+        let selectedTeamCode = teamsFilter.find(":selected")[0].value;
+        let showAllTeams = selectedTeamCode.trim().toLowerCase() === "all";
+        let allPlayerRows = $("#roster-table-data tr");
+        for(let i = 0; i < allPlayerRows.length; ++i) {
+            let playerRow = allPlayerRows[i];
+            let playerTeamCode = $(playerRow).find(".row-id")[0].innerText;
+            let match = showAllTeams || (playerTeamCode.trim().toLowerCase() === selectedTeamCode.trim().toLowerCase());
+            if(match) {
+                playerRow.style.display = "";
+            } else {
+                playerRow.style.display = "none";
+            }
+        }
+
+        document.getElementById("roster-table").style.display = "table";
+        document.getElementById("loading-indicator").style.display = "none";
+    });
+}
+
+async function resetScrapedData() {
+    await resetTeamsList();
+    await resetPlayersTable();
+}
+
+async function resetTeamsList() {
+    let teamsFilter = $("#teams-filter");
+
+    // keep the first 2 options in the list
+    teamsFilter.find("option").not(":first").remove();
+
+    let allTeams = await getAllFromTable(TABLE_NAMES.team);
+    for(let i = 0; i < allTeams.length; ++i) {
+        let team = allTeams[i];
+
+        let option = document.createElement("option");
+        option.value = team.teamCode;
+        option.innerText = team.fullName;
+        teamsFilter.append(option);
+    }
 }
 
 async function resetPlayersTable() {
@@ -30,6 +74,7 @@ async function resetPlayersTable() {
         let playerRow = document.createElement("tr");
         
         let teamVal = genTableData(player.teamCode);
+        teamVal.className = "row-id";
         let posVal = genTableData(player.position);
         let numVal = genTableData(player.jerseyNumber);
         let lNameVal = genTableData(player.lastName);
