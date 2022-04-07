@@ -19,71 +19,75 @@ async function initScraper() {
         location.reload();
     });
 
-    let teamsFilter = $("#teams-filter");
-    teamsFilter.on("change", function () {
-        document.getElementById("roster-table").style.display = "none";
-        document.getElementById("loading-indicator").style.display = "table";
-
-        let selectedTeamCode = teamsFilter.find(":selected")[0].value;
-        let showAllTeams = selectedTeamCode.trim().toLowerCase() === "all";
-        let allPlayerRows = $("#roster-table-data tr");
-        for(let i = 0; i < allPlayerRows.length; ++i) {
-            let playerRow = allPlayerRows[i];
-            let playerTeamCode = $(playerRow).find(".row-id")[0].innerText;
-            let match = showAllTeams || (playerTeamCode.trim().toLowerCase() === selectedTeamCode.trim().toLowerCase());
-            if(match) {
-                playerRow.style.display = "";
-            } else {
-                playerRow.style.display = "none";
-            }
-        }
-
-        document.getElementById("roster-table").style.display = "table";
-        document.getElementById("loading-indicator").style.display = "none";
-    });
+    initFilters();
 }
 
 async function resetScrapedData() {
     await resetTeamsList();
+    await resetPositionList();
     await resetPlayersTable();
 }
 
 async function resetTeamsList() {
-    let teamsFilter = $("#teams-filter");
+    const teamsFilter = $("#teams-filter");
 
-    // keep the first 2 options in the list
+    // keep the first option in the list
     teamsFilter.find("option").not(":first").remove();
 
-    let allTeams = await getAllFromTable(TABLE_NAMES.team);
+    const allTeams = await getAllFromTable(TABLE_NAMES.team);
     for(let i = 0; i < allTeams.length; ++i) {
-        let team = allTeams[i];
+        const team = allTeams[i];
 
-        let option = document.createElement("option");
+        const option = document.createElement("option");
         option.value = team.teamCode;
         option.innerText = team.fullName;
         teamsFilter.append(option);
     }
 }
 
+async function resetPositionList() {
+    const positionFilter = $("#position-filter");
+
+    // keep the first option in the list
+    positionFilter.find("option").not(":first").remove();
+
+    const allPlayers = await getAllFromTable(TABLE_NAMES.player);
+    const allPositions = [];
+    for(let i = 0; i < allPlayers.length; ++i) {
+        const player = allPlayers[i];
+        const playerPosition = player.position.trim().toUpperCase();
+        if(!allPositions.includes(playerPosition)) {
+            allPositions.push(playerPosition);
+
+            const option = document.createElement("option");
+            option.value = playerPosition;
+            option.innerText = playerPosition;
+            positionFilter.append(option);
+        }
+    }
+}
+
 async function resetPlayersTable() {
     $("#roster-table-data").empty();
 
-    let allPlayers = await getAllFromTable(TABLE_NAMES.player);
+    const allPlayers = await getAllFromTable(TABLE_NAMES.player);
     for(let i = 0; i < allPlayers.length; ++i) {
-        let player = allPlayers[i];
-        let playerRow = document.createElement("tr");
+        const player = allPlayers[i];
+        const playerRow = document.createElement("tr");
         
-        let teamVal = genTableData(player.teamCode);
-        teamVal.className = "row-id";
-        let posVal = genTableData(player.position);
-        let numVal = genTableData(player.jerseyNumber);
-        let lNameVal = genTableData(player.lastName);
-        let fNameVal = genTableData(player.firstName);
-        let heightVal = genTableData(player.height);
-        let weightVal = genTableData(player.weight);
-        let collegeVal = genTableData(player.college);
-        let expVal = genTableData(player.experience);
-        let dobVal = genTableData(player.birthDate);
+        const teamVal = genTableData(player.teamCode);
+        const posVal = genTableData(player.position);
+        const numVal = genTableData(player.jerseyNumber);
+        const lNameVal = genTableData(player.lastName);
+        const fNameVal = genTableData(player.firstName);
+        const heightVal = genTableData(player.height);
+        const weightVal = genTableData(player.weight);
+        const collegeVal = genTableData(player.college);
+        const expVal = genTableData(player.experience);
+        const dobVal = genTableData(player.birthDate);
+
+        teamVal.className = "team-id";
+        posVal.className = "position";
 
         playerRow.appendChild(teamVal);
         playerRow.appendChild(posVal);
@@ -100,8 +104,48 @@ async function resetPlayersTable() {
     }
 }
 
+function initFilters() {
+    const allFilters = $("#roster-filters > select");
+    for(let i = 0; i < allFilters.length; ++i) {
+        const filter = allFilters[i];
+        $(filter).on("change", function () { filterPlayers(allFilters) });
+    }
+}
+
+function filterPlayers(allFilters) {
+    document.getElementById("roster-table").style.display = "none";
+    document.getElementById("loading-indicator").style.display = "table";
+    
+    const allPlayerRows = $("#roster-table-data tr");
+    for(let i = 0; i < allPlayerRows.length; ++i) {
+        const playerRow = allPlayerRows[i];
+
+        let match = true;
+        for(let j = 0; j < allFilters.length; ++j) {
+            const filter = allFilters[j];
+
+            const filterValClass = filter.dataset.valueClass;
+            const filterSelectedVal = $(filter).find(":selected")[0].value;
+            const showAll = filterSelectedVal.trim().toLowerCase() === "all";
+            const playerColVal = $(playerRow).find(`.${filterValClass}`)[0].innerText;
+
+            const filterMatch = showAll || (playerColVal.trim().toLowerCase() === filterSelectedVal.trim().toLowerCase());
+            match = match && filterMatch;
+        }
+
+        if(match) {
+            playerRow.style.display = "";
+        } else {
+            playerRow.style.display = "none";
+        }
+    }
+
+    document.getElementById("roster-table").style.display = "table";
+    document.getElementById("loading-indicator").style.display = "none";
+}
+
 function genTableData(cellVal) {
-    let cell = document.createElement("td");
+    const cell = document.createElement("td");
     cell.innerText = cellVal;
     return cell;
 }

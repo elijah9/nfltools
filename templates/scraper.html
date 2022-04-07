@@ -12,14 +12,17 @@
         <button type="button" class="btn btn-dark" id="reset-db-button">reset db</button>
     </div>
 
-    <div class="outline margin-top">
-        <select id="teams-filter" class="form-select">
-            <option selected value="all">Select team</option>
-        </select>
-    </div>
-
     <div class="outline auto-width margin-top">
-        <table id="roster-table" class="table table-light table-striped table-hover table-sm table-sortable">
+        <div id="roster-filters" class="d-flex justify-content-center">
+            <select id="teams-filter" class="form-select" data-value-class="team-id">
+                <option selected value="all">Select team</option>
+            </select>
+            <select id="position-filter" class="form-select" data-value-class="position">
+                <option selected value="all">Select position</option>
+            </select>
+        </div>
+
+        <table id="roster-table" class="table table-light table-striped table-hover table-sm table-sortable margin-top">
             <thead>
                 <tr>
                     <th scope="col">Team</th>
