@@ -1,4 +1,5 @@
-from flask import Flask, render_template
+from datetime import date
+from flask import Flask, Response, render_template, request
 from scraping.league_scraper import scrape_league
 
 app = Flask(__name__)
@@ -19,6 +20,3 @@ def scraper():
 def scrape_teams():
     year = 2022
     return scrape_league(year)
-
-if __name__ == "__main__":
-    app.run(debug=True)

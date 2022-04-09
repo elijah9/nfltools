@@ -21,6 +21,16 @@ async function getAllFromTable(tableName) {
     return data;
 }
 
+async function getAllTables() {
+    const db = new Localbase(_dbName);
+    const data = {};
+    for(let [key, tableName] of Object.entries(TABLE_NAMES)) {
+        const tableData = await db.collection(tableName).get();
+        data[tableName] = tableData;
+    }
+    return data;
+}
+
 async function writeAllToTable(tableName, data) {
     const db = new Localbase(_dbName);
     for(let i = 0; i < data.length; ++i) {

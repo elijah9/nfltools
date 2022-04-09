@@ -1,3 +1,7 @@
+* {
+    font-family: 'Andale Mono', monospace;
+}
+
 div#body-content {
     margin: 20px 150px 0px 150px;
 }

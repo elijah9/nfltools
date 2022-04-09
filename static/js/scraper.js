@@ -19,6 +19,35 @@ async function initScraper() {
         location.reload();
     });
 
+    $("button#download-db-button").on("click", async function (e) {
+        const data = await getAllTables();
+        const jsonData = JSON.stringify(data, null, 4);
+        const content = "data:text/json;charset=utf-8," + jsonData;
+        downloadFile("nfltools_db_tables.json", content);
+    });
+
+    $("button#download-players-button").on("click", async function (e) {
+        const allPlayers = await getAllFromTable(TABLE_NAMES.player);
+        const rows = [];
+
+        const headerRow = [];
+        for(let [fieldName, fieldVal] of Object.entries(allPlayers[0])) {
+            headerRow.push(fieldName);
+        }
+        rows.push(headerRow);
+
+        for(let i = 0; i < allPlayers.length; ++i) {
+            const row = [];
+            for(let [fieldName, fieldVal] of Object.entries(allPlayers[i])) {
+                row.push(fieldVal);
+            }
+            rows.push(row);
+        }
+
+        const csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+        downloadFile("nfltools_players.csv", csvContent);
+    });
+
     initFilters();
 }
 
@@ -144,8 +173,3 @@ function filterPlayers(allFilters) {
     document.getElementById("loading-indicator").style.display = "none";
 }
 
-function genTableData(cellVal) {
-    const cell = document.createElement("td");
-    cell.innerText = cellVal;
-    return cell;
-}

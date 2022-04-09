@@ -10,15 +10,17 @@
     <div id="scraper-buttons" class="outline">
         <button type="button" class="btn btn-dark" id="scrape-button">scrape</button>
         <button type="button" class="btn btn-dark" id="reset-db-button">reset db</button>
+        <button type="button" class="btn btn-dark" id="download-db-button">download db (json)</button>
+        <button type="button" class="btn btn-dark" id="download-players-button">download players (csv)</button>
     </div>
 
     <div class="outline auto-width margin-top">
         <div id="roster-filters" class="d-flex justify-content-center">
             <select id="teams-filter" class="form-select" data-value-class="team-id">
-                <option selected value="all">Select team</option>
+                <option selected value="all">Select team...</option>
             </select>
             <select id="position-filter" class="form-select" data-value-class="position">
-                <option selected value="all">Select position</option>
+                <option selected value="all">Select position...</option>
             </select>
         </div>
 
