@@ -3,8 +3,6 @@
 Flask app which ideally should replace everything I currently do in a spreadsheet to keep track of football stuff. Mostly a vehicle for me to have a code project to work on in my spare time.
 
 ## To do
-- JSON, CSV export of data
-- JSON import of data
 - Formalize table structure
 - Clean scraped data
 - Interface for editing player info

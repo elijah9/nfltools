@@ -5,8 +5,7 @@ function genTableData(cellVal) {
 }
 
 function downloadFile(filename, content) {
-    const today = new Date();
-    const todayStr = today.toISOString().split("T")[0].replace("-", "");
+    const todayStr = getTodayStr();
     const splitFilename = filename.split(".");
     const filenameWithDate = `${splitFilename[0]}_${todayStr}.${splitFilename[1]}`;
 
@@ -18,4 +17,11 @@ function downloadFile(filename, content) {
 
     link.click();
     document.body.removeChild(link);
+}
+
+function getTodayStr() {
+    let today = new Date();
+    const offset = today.getTimezoneOffset();
+    today = new Date(today.getTime() - (offset*60*1000));
+    return today.toISOString().split("T")[0].replace(/-/g, "");
 }

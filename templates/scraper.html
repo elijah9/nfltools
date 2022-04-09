@@ -14,6 +14,16 @@
         <button type="button" class="btn btn-dark" id="download-players-button">download players (csv)</button>
     </div>
 
+    <div id="import-controls" class="outline margin-top">
+        <input class="form-control form-control-sm" id="import-file" type="file" accept=".json,text/json,application/json">
+        <div class="margin-top">
+            <div style="width: 10rem; display: inline-block;">
+                <b class="import-status" style="color: red;">no data uploaded</b>
+            </div>
+            <button type="button" class="btn btn-dark" id="import-button" disabled>import json</button>
+        </div>
+    </div>
+
     <div class="outline auto-width margin-top">
         <div id="roster-filters" class="d-flex justify-content-center">
             <select id="teams-filter" class="form-select" data-value-class="team-id">
