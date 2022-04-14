@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from scraping.base_scraper import PFR_BASE_URL
-from scraping.team_scraper import scrape_team, scrape_team_players, standardize_team_code
+from scraping.team_scraper import scrape_retired_numbers, scrape_team, scrape_team_players, standardize_team_code
 
 def scrape_league(year):
     league_url = f"{PFR_BASE_URL}/teams/"
@@ -13,6 +13,7 @@ def scrape_league(year):
     all_teams = []
     all_players = []
     player_teams = []
+    all_retired_numbers = []
 
     i = 0
     for row in team_rows:
@@ -34,8 +35,13 @@ def scrape_league(year):
 
             i += 1
 
+        team_retired_numbers = scrape_retired_numbers(team_code)
+        for retired in team_retired_numbers:
+            all_retired_numbers.append(retired)
+
     return {
         "teams": all_teams,
         "players": all_players,
-        "playerTeams": player_teams
+        "playerTeams": player_teams,
+        "retiredNumbers": all_retired_numbers
     }

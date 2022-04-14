@@ -9,6 +9,7 @@ async function initScraper() {
             await writeAllToTable(TABLE_NAMES.team, data.teams);
             await writeAllToTable(TABLE_NAMES.player, data.players);
             await writeAllToTable(TABLE_NAMES.playerTeams, data.playerTeams);
+            await writeAllToTable(TABLE_NAMES.retiredNumbers, data.retiredNumbers);
             await resetScrapedData();
             document.getElementById("loading-indicator").style.display = "none";
         });
