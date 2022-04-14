@@ -8,6 +8,7 @@ async function initScraper() {
         fetch("/scraper/data").then(response => response.json()).then(async function(data) {
             await writeAllToTable(TABLE_NAMES.team, data.teams);
             await writeAllToTable(TABLE_NAMES.player, data.players);
+            await writeAllToTable(TABLE_NAMES.playerTeams, data.playerTeams);
             await resetScrapedData();
             document.getElementById("loading-indicator").style.display = "none";
         });
@@ -92,11 +93,15 @@ async function resetPlayersTable() {
     document.getElementById("roster-table-data").replaceChildren();
 
     const allPlayers = await getAllFromTable(TABLE_NAMES.player);
+    const allPlayerTeams = await getAllFromTable(TABLE_NAMES.playerTeams);
     for(let i = 0; i < allPlayers.length; ++i) {
         const player = allPlayers[i];
+        const playerTeam = allPlayerTeams.filter(function (pt) {
+            return pt.playerId === player.playerId;
+        })[0];
         const playerRow = document.createElement("tr");
         
-        const teamVal = genTableData(player.teamCode);
+        const teamVal = genTableData(playerTeam.teamCode);
         const posVal = genTableData(player.position);
         const numVal = genTableData(player.jerseyNumber);
         const lNameVal = genTableData(player.lastName);

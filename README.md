@@ -1,18 +1,11 @@
-
 # nfltools
 Flask app which ideally should replace everything I currently do in a spreadsheet to keep track of football stuff. Mostly a vehicle for me to have a code project to work on in my spare time.
 
 ## To do
-- Formalize table structure
-- Clean scraped data
 - Interface for editing player info
 - Web hosting (https://www.pythonanywhere.com/ maybe)
 
 ## Ideas
-### Scraping
-- Store data client-side in IndexedDB
-- Allow JSON import and export
-
 ### Ratings engine
 - Specify a set of attributes which contribute to an overall rating
 - Create set of archetypes (pre-set attribute values) for different types of players
@@ -23,7 +16,7 @@ Flask app which ideally should replace everything I currently do in a spreadshee
   - This could be used to make it a generic roster editor for any football game like Madden, 2k5, Front Office Football (RIP to the latter two series)
 
 ### Table structure
-- PlayerTeamAssignment to store player, team, start year, end 
+- RetiredNumbers to store team ID, jersey number, year retired
 - PlayerRating to store player ID, attribute ID, attribute value
 - RatingAttribute to store attribute ID, attribute name short, attribute name long
 

@@ -1,6 +1,7 @@
 const TABLE_NAMES = {
     team: "team",
-    player: "player"
+    player: "player",
+    playerTeams: "playerTeams"
 };
 
 const _transactionTypes = {
