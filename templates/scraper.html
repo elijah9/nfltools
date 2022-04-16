@@ -8,7 +8,7 @@
     <h1>{{title}}</h1>
 
     <div id="scraper-buttons" class="outline">
-        <button type="button" class="btn btn-dark" id="scrape-button">scrape</button>
+        <button type="button" class="btn btn-primary" id="scrape-button">scrape</button>
         <button type="button" class="btn btn-dark" id="reset-db-button">reset db</button>
         <button type="button" class="btn btn-dark" id="download-db-button">download db (json)</button>
         <button type="button" class="btn btn-dark" id="download-players-button">download players (csv)</button>
@@ -20,51 +20,9 @@
             <div style="width: 10rem; display: inline-block;">
                 <b class="import-status" style="color: red;">no data uploaded</b>
             </div>
-            <button type="button" class="btn btn-dark" id="import-button" disabled>import json</button>
+            <button type="button" class="btn btn-primary" id="import-button" disabled>import json</button>
         </div>
     </div>
-
-    <div class="outline auto-width margin-top">
-        <div id="roster-filters" class="d-flex justify-content-center">
-            <select id="teams-filter" class="form-select" data-value-class="team-id">
-                <option selected value="all">Select team...</option>
-            </select>
-            <select id="position-filter" class="form-select" data-value-class="position">
-                <option selected value="all">Select position...</option>
-            </select>
-        </div>
-
-        <table id="roster-table" class="table table-light table-striped table-hover table-sm table-sortable margin-top">
-            <thead>
-                <tr>
-                    <th scope="col">Team</th>
-                    <th scope="col">Pos.</th>
-                    <th scope="col" data-col-type="int">#</th>
-                    <th scope="col">Last</th>
-                    <th scope="col">First</th>
-                    <th scope="col" data-col-type="height">Height</th>
-                    <th scope="col" data-col-type="int">Weight</th>
-                    <th scope="col">College</th>
-                    <th scope="col" data-col-type="int">Exp.</th>
-                    <th scope="col" data-col-type="date">DOB</th>
-                </tr>
-            </thead>
-            <tbody id="roster-table-data"></tbody>
-        </table>
-
-        <div id="loading-indicator" class="margin-top hidden">
-            <div class="tbl">
-                <div class="spinner-border tbl-cell" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <div id="loading-text" class="tbl-cell">
-                    chill for a second...
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div id="all-teams"></div>
 {% endblock %}
 
 {% block scripts %}

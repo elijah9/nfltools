@@ -23,6 +23,12 @@ async function getAllFromTable(tableName) {
     return data;
 }
 
+async function getSingleFromTable(tableName, filters) {
+    const db = new Localbase(_dbName);
+    const data = await db.collection(tableName).doc(filters).get();
+    return data;
+}
+
 async function getAllTables() {
     const db = new Localbase(_dbName);
     const data = {};

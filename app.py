@@ -20,3 +20,14 @@ def scraper():
 def scrape_teams():
     year = 2022
     return scrape_league(year)
+
+@app.route("/players")
+def players():
+    title = "players"
+    return render_template("players.html", title=title)
+
+@app.route("/edit-player")
+def edit_player():
+    player_id = request.args.get('player_id', type=int)
+    title = "edit player"
+    return render_template("edit-player.html", title=title, player_id=player_id)

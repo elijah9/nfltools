@@ -4,6 +4,13 @@ function genTableData(cellVal) {
     return cell;
 }
 
+function genHiddenValue(val) {
+    const hidden = document.createElement("input");
+    hidden.setAttribute("hidden", "true");
+    hidden.value = val;
+    return hidden;
+}
+
 function downloadFile(filename, content) {
     const todayStr = getTodayStr();
     const splitFilename = filename.split(".");
