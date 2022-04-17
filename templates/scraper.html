@@ -23,6 +23,17 @@
             <button type="button" class="btn btn-primary" id="import-button" disabled>import json</button>
         </div>
     </div>
+
+    <div id="loading-indicator" class="margin-top hidden">
+        <div class="tbl">
+            <div class="spinner-border tbl-cell" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div id="loading-text" class="tbl-cell">
+                chill for a second...
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block scripts %}

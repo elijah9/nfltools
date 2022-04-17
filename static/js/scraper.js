@@ -4,32 +4,44 @@ async function initScraper() {
     document.getElementById("scrape-button").addEventListener("click", async function (e) {
         document.getElementById("loading-indicator").style.display = "table";
         fetch("/scraper/data").then(response => response.json()).then(async function(data) {
+            console.log(data);
+            
             await writeAllToTable(TABLE_NAMES.team, data.teams);
             await writeAllToTable(TABLE_NAMES.player, data.players);
             await writeAllToTable(TABLE_NAMES.playerTeams, data.playerTeams);
             await writeAllToTable(TABLE_NAMES.retiredNumbers, data.retiredNumbers);
+            await writeAllToTable(TABLE_NAMES.position, data.positions);
+            await writeAllToTable(TABLE_NAMES.college, data.colleges);
+
             document.getElementById("loading-indicator").style.display = "none";
         });
     });
 
     document.getElementById("reset-db-button").addEventListener("click", async function (e) {
-        document.getElementById("loading-indicator").style.display = "table";
-        await resetDb();
-        location.reload();
+        await showLoadingIndicator(async function () {
+            await resetDb();
+            location.reload();
+        });
     });
 
     document.getElementById("download-db-button").addEventListener("click", async function (e) {
-        await downloadDb();
+        await showLoadingIndicator(downloadDb);
     });
 
     document.getElementById("download-players-button").addEventListener("click", async function (e) {
-        await downloadPlayers();
+        await showLoadingIndicator(downloadPlayers);
     });
 
     document.getElementById("import-file").addEventListener("change", validateDbJson);
     document.getElementById("import-button").addEventListener("click", async function (e) {
-        await importJsonToDb();
+        await showLoadingIndicator(importJsonToDb);
     });
+}
+
+async function showLoadingIndicator(work) {
+    document.getElementById("loading-indicator").style.display = "table";
+    await work();
+    document.getElementById("loading-indicator").style.display = "none";
 }
 
 async function downloadDb() {
@@ -62,6 +74,8 @@ async function downloadPlayers() {
 }
 
 function validateDbJson(event) {
+    document.getElementById("loading-indicator").style.display = "table";
+
     const input = event.target;
     const status = document.querySelector(".import-status");
     const importButton = document.getElementById("import-button");
@@ -87,6 +101,8 @@ function validateDbJson(event) {
         status.innerText = "no data uploaded";
         importButton.setAttribute("disabled", "true");
     }
+
+    document.getElementById("loading-indicator").style.display = "none";
 }
 
 function isDbJsonValid(e) {
@@ -109,9 +125,6 @@ function isDbJsonValid(e) {
 }
 
 async function importJsonToDb() {
-    document.getElementById("roster-table").style.display = "none";
-    document.getElementById("loading-indicator").style.display = "table";
-
     const input = document.getElementById("import-file");
     try {
         const file = input.files[0];
@@ -125,9 +138,6 @@ async function importJsonToDb() {
                 tableData = fileObjMap[i][1];
                 await writeAllToTable(tableName, tableData);
             }
-
-            document.getElementById("roster-table").style.display = "table";
-            document.getElementById("loading-indicator").style.display = "none";
         }
 
         reader.readAsText(file, "UTF-8");

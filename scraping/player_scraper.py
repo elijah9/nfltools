@@ -5,11 +5,17 @@ def scrape_player(row_soup, year):
     position = row_soup.select('td[data-stat="pos"]')[0].text
     weight = row_soup.select('td[data-stat="weight"]')[0].text
     height = row_soup.select('td[data-stat="height"]')[0].text
-    college = row_soup.select('td[data-stat="college_id"]')[0].text
+    college_id = row_soup.select('td[data-stat="college_id"]')[0].text
     birth_date = row_soup.select('td[data-stat="birth_date_mod"]')[0].text
     experience = row_soup.select('td[data-stat="experience"]')[0].text
     av_rating = row_soup.select('td[data-stat="av"]')[0].text
     # print(f"{position} #{jersey_number} - {first_name} {last_name} - {height} {weight} - {college} - {birth_date} ({experience}) - {year} AV: {av_rating}")
+
+    # only use last college
+    colleges = college_id.split(",")
+    last_college = colleges[len(colleges) - 1]
+    if (not last_college) or (last_college.strip().lower() == "no college"):
+        last_college = "None"
 
     return {
         "lastName": last_name,
@@ -18,7 +24,7 @@ def scrape_player(row_soup, year):
         "position": convert_pfr_position(position),
         "height": height,
         "weight": weight,
-        "college": college,
+        "college": last_college,
         "birthDate": birth_date,
         "experience": convert_pfr_experience(experience),
         "avRating": av_rating

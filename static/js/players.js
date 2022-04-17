@@ -7,6 +7,7 @@ async function initPlayers() {
 async function resetScrapedData() {
     await resetTeamsList();
     await resetPositionList();
+    await resetCollegeList();
     await resetPlayersTable();
 }
 
@@ -26,7 +27,7 @@ async function resetTeamsList() {
 
         const option = document.createElement("option");
         option.value = team.teamCode;
-        option.innerText = team.fullName;
+        option.innerText = `${team.fullName} (${team.teamCode})`;
         teamsFilter.append(option);
     }
 }
@@ -41,19 +42,33 @@ async function resetPositionList() {
         }
     });
 
-    const allPlayers = await getAllFromTable(TABLE_NAMES.player);
-    const allPositions = [];
-    for(let i = 0; i < allPlayers.length; ++i) {
-        const player = allPlayers[i];
-        const playerPosition = player.position.trim().toUpperCase();
-        if(!allPositions.includes(playerPosition)) {
-            allPositions.push(playerPosition);
+    const allPositions = await getAllFromTable(TABLE_NAMES.position);
+    for(let i = 0; i < allPositions.length; ++i) {
+        const position = allPositions[i];
+        const option = document.createElement("option");
+        option.value = position.positionCode;
+        option.innerText = `${position.fullName} (${position.positionCode})`;
+        positionFilter.append(option);
+    }
+}
 
-            const option = document.createElement("option");
-            option.value = playerPosition;
-            option.innerText = playerPosition;
-            positionFilter.append(option);
+async function resetCollegeList() {
+    const collegeFilter = document.getElementById("college-filter");
+
+    // keep the first option in the list
+    collegeFilter.querySelectorAll("option").forEach(function (v, i) { 
+        if(i != 0) {
+            v.remove(); 
         }
+    });
+
+    const allColleges = await getAllFromTable(TABLE_NAMES.college);
+    for(let i = 0; i < allColleges.length; ++i) {
+        const college = allColleges[i];
+        const option = document.createElement("option");
+        option.value = college.collegeName;
+        option.innerText = college.collegeName;
+        collegeFilter.append(option);
     }
 }
 
@@ -84,6 +99,7 @@ async function resetPlayersTable() {
         idVal.className = "player-id";
         teamVal.className = "team-id";
         posVal.className = "position";
+        collegeVal.className = "college";
 
         playerRow.appendChild(idVal);
         playerRow.appendChild(teamVal);

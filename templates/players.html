@@ -15,6 +15,9 @@
             <select id="position-filter" class="form-select pad-sides" data-value-class="position">
                 <option selected value="all">Select position...</option>
             </select>
+            <select id="college-filter" class="form-select pad-sides" data-value-class="college">
+                <option selected value="all">Select college...</option>
+            </select>
         </div>
 
         <table id="roster-table" class="table table-light table-striped table-hover table-sm table-sortable margin-top">
@@ -33,18 +36,18 @@
                 </tr>
             </thead>
             <tbody id="roster-table-data"></tbody>
-        </table>
 
-        <div id="loading-indicator" class="margin-top hidden">
-            <div class="tbl">
-                <div class="spinner-border tbl-cell" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <div id="loading-text" class="tbl-cell">
-                    chill for a second...
+            <div id="loading-indicator" class="margin-top hidden">
+                <div class="tbl">
+                    <div class="spinner-border tbl-cell" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div id="loading-text" class="tbl-cell">
+                        chill for a second...
+                    </div>
                 </div>
             </div>
-        </div>
+        </table>
     </div>
 
     <div id="context-menu">

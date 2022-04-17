@@ -2,7 +2,9 @@ const TABLE_NAMES = {
     team: "team",
     player: "player",
     playerTeams: "playerTeams",
-    retiredNumbers: "retiredNumbers"
+    retiredNumbers: "retiredNumbers",
+    position: "position",
+    college: "college"
 };
 
 const _transactionTypes = {
@@ -40,6 +42,7 @@ async function getAllTables() {
 }
 
 async function writeAllToTable(tableName, data) {
+    console.log({tableName, data});
     const db = new Localbase(_dbName);
     for(let i = 0; i < data.length; ++i) {
         await db.collection(tableName).add(data[i]);

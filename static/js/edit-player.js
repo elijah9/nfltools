@@ -3,15 +3,26 @@ async function initEditPlayer() {
     const playerId = document.getElementById("player-id").value;
     const player = await getSingleFromTable(TABLE_NAMES.player, { playerId: parseInt(playerId) });
     const currentPlayerTeam = await getSingleFromTable(TABLE_NAMES.playerTeams, { playerId: parseInt(playerId) });
+    
     const allTeams = await getAllFromTable(TABLE_NAMES.team);
     const allTeamCodes = Object.assign({}, ...allTeams.map(t => ({[t.teamCode]: t.fullName})));
     const currentTeamCode = currentPlayerTeam.teamCode;
 
+    const allPositions = await getAllFromTable(TABLE_NAMES.position);
+    const allPosCodes = Object.assign({}, ...allPositions.map(p => ({[p.positionCode]: p.fullName})));
+    const currentPosCode = player.position;
+    
+    const allColleges = await getAllFromTable(TABLE_NAMES.college);
+    const allCollegeOptions = Object.assign({}, ...allColleges.map(c => ({[c.collegeName]: c.collegeName})));
+    const currentCollege = player.college;
+
     appendInputRow(form, "firstName", player.firstName, "text", "first name");
     appendInputRow(form, "lastName", player.lastName, "text", "last name");
     appendInputRow(form, "teamCode", currentTeamCode, "dropdown", "team", allTeamCodes);
+    appendInputRow(form, "position", currentPosCode, "dropdown", "position", allPosCodes);
     appendInputRow(form, "jerseyNumber", player.jerseyNumber, "number", "jersey number");
     appendInputRow(form, "birthDate", player.birthDate, "date", "birth date");
+    appendInputRow(form, "college", currentCollege, "dropdown", "college", allCollegeOptions);
 
     console.log(player);
 
