@@ -7,7 +7,7 @@
 {% block content %}
     <h1>{{title}}</h1>
 
-    <form class="outline margin-top">
+    <form id="edit-player-form" class="outline margin-top hidden">
         <input id="player-id" type="hidden" value="{{player_id}}">
 
         <div id="form-rows"></div>
@@ -17,11 +17,22 @@
             <button type="button" class="btn btn-dark col-auto margin-left" id="reset">Reset</button>
         </div>
     </form>
+
+    <div id="loading-indicator" class="margin-top hidden">
+        <div class="tbl">
+            <div class="spinner-border tbl-cell" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div id="loading-text" class="tbl-cell">
+                chill for a second...
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block scripts %}
     <script src="{{ url_for('static', filename='js/edit-player.js') }}"></script>
     <script>
-        initEditPlayer();
+        showLoadingIndicator(initEditPlayer);
     </script>
 {% endblock %}

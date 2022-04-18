@@ -85,32 +85,16 @@ async function resetPlayersTable() {
         const playerRow = document.createElement("tr");
         playerRow.dataset.rowId = player.playerId;
         
-        const teamVal = genTableData(playerTeam.teamCode);
-        const posVal = genTableData(player.position);
-        const numVal = genTableData(player.jerseyNumber);
-        const lNameVal = genTableData(player.lastName);
-        const fNameVal = genTableData(player.firstName);
-        const heightVal = genTableData(player.height);
-        const weightVal = genTableData(player.weight);
-        const collegeVal = genTableData(player.college);
-        const expVal = genTableData(player.experience);
-        const dobVal = genTableData(player.birthDate);
-
-        teamVal.className = "team-id";
-        posVal.className = "position";
-        collegeVal.className = "college";
-
-        playerRow.appendChild(teamVal);
-        playerRow.appendChild(posVal);
-        playerRow.appendChild(numVal);
-        playerRow.appendChild(lNameVal);
-        playerRow.appendChild(fNameVal);
-        playerRow.appendChild(heightVal);
-        playerRow.appendChild(weightVal);
-        playerRow.appendChild(collegeVal);
-        playerRow.appendChild(expVal);
-        playerRow.appendChild(dobVal);
-
+        appendTableData(playerRow, playerTeam.teamCode, "team-id");
+        appendTableData(playerRow, player.position, "position");
+        appendTableData(playerRow, player.jerseyNumber);
+        appendTableData(playerRow, player.lastName);
+        appendTableData(playerRow, player.firstName);
+        appendTableData(playerRow, player.height);
+        appendTableData(playerRow, player.weight);
+        appendTableData(playerRow, player.college, "college");
+        appendTableData(playerRow, player.firstYear);
+        appendTableData(playerRow, player.birthDate);
         playerRow.className = "player";
 
         document.getElementById("roster-table-data").appendChild(playerRow);

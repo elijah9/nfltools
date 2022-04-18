@@ -26,7 +26,7 @@ def scrape_player(row_soup, year):
         "weight": weight,
         "college": last_college,
         "birthDate": birth_date,
-        "experience": convert_pfr_experience(experience),
+        "firstYear": convert_pfr_experience(year, experience),
         "avRating": av_rating
     }
 
@@ -70,8 +70,10 @@ def convert_pfr_position(pfr_pos):
     else:
         raise ValueError(f"Unrecognized position found: {pfr_pos}")
 
-def convert_pfr_experience(pfr_exp):
+def convert_pfr_experience(year, pfr_exp):
     if "Rook" in pfr_exp:
-        return 1
+        experience = 1
     else:
-        return pfr_exp
+        experience = int(pfr_exp)
+    
+    return year - experience

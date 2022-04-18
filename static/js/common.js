@@ -1,7 +1,10 @@
-function genTableData(cellVal) {
+function appendTableData(parent, cellVal, className=null) {
     const cell = document.createElement("td");
     cell.innerText = cellVal;
-    return cell;
+    if(className !== null) {
+        cell.className = className;
+    }
+    parent.appendChild(cell);
 }
 
 function downloadFile(filename, content) {
@@ -24,4 +27,10 @@ function getTodayStr() {
     const offset = today.getTimezoneOffset();
     today = new Date(today.getTime() - (offset*60*1000));
     return today.toISOString().split("T")[0].replace(/-/g, "");
+}
+
+async function showLoadingIndicator(work) {
+    document.getElementById("loading-indicator").style.display = "table";
+    await work();
+    document.getElementById("loading-indicator").style.display = "none";
 }

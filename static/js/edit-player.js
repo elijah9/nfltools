@@ -4,20 +4,30 @@ async function initEditPlayer() {
     const player = await getSingleFromTable(TABLE_NAMES.player, { playerId: parseInt(playerId) });
     const currentPlayerTeam = await getSingleFromTable(TABLE_NAMES.playerTeams, { playerId: parseInt(playerId) });
 
-    // TODO: way too many parameters in here, clean up somehow
+    const teamOptions = await getDropdownOptions(TABLE_NAMES.team, "teamCode", "fullName");
+    const positionOptions = await getDropdownOptions(TABLE_NAMES.position, "positionCode", "fullName");
+    const collegeOptions = await getDropdownOptions(TABLE_NAMES.college, "collegeName", "collegeName");
+    const numberOptions = await getAvailableJerseyNumbers(currentPlayerTeam, player);
+    const heightOptions = getHeightOptions();
+    const draftClassOptions = getDraftClassOptions(2022);
+
+    // TODO: too many parameters in here, clean up somehow
     appendInputRow(form, "firstName", player.firstName, "text", "first name");
     appendInputRow(form, "lastName", player.lastName, "text", "last name");
-    await appendDropdown(form, "teamCode", currentPlayerTeam.teamCode, "team", TABLE_NAMES.team, "teamCode", "fullName");
-    await appendDropdown(form, "position", player.position, "position", TABLE_NAMES.position, "positionCode", "fullName");
-    appendInputRow(form, "jerseyNumber", player.jerseyNumber, "number", "jersey number");
+    appendDropdownRow(form, "teamCode", currentPlayerTeam.teamCode, teamOptions, "team");
+    appendDropdownRow(form, "position", player.position, positionOptions, "position");
+    appendDropdownRow(form, "jerseyNumber", player.jerseyNumber, numberOptions, "jersey number");
+    appendDropdownRow(form, "height", player.height, heightOptions, "height");
+    appendInputRow(form, "weight", player.weight, "number", "weight");
     appendInputRow(form, "birthDate", player.birthDate, "date", "birth date");
-    await appendDropdown(form, "college", player.college, "college", TABLE_NAMES.college, "collegeName", "collegeName");
-
-    console.log(player);
+    appendDropdownRow(form, "firstYear", player.firstYear, draftClassOptions, "draft class");
+    appendDropdownRow(form, "college", player.college, collegeOptions, "college");
 
     document.getElementById("reset").addEventListener("click", async function () {
         await resetEditPlayerForm();
     });
+
+    document.getElementById("edit-player-form").style.display = "table";
 }
 
 async function resetEditPlayerForm() {
@@ -34,10 +44,57 @@ async function resetEditPlayerForm() {
     }
 }
 
-async function appendDropdown(form, id, val, labelVal, tableName, keyId, valId) {
-    const allRows = await getAllFromTable(tableName);
-    const options = Object.assign({}, ...allRows.map(t => ({[t[keyId]]: t[valId]})));
+async function getAvailableJerseyNumbers(team, currentPlayer) {
+    const teamPlayers = await getAllFromTable(TABLE_NAMES.playerTeams, { teamCode: team.teamCode });
+    const retiredNumbers = await getAllFromTable(TABLE_NAMES.retiredNumbers, { teamCode: team.teamCode });
+    const takenNumbers = [];
+    for(let i = 0; i < teamPlayers.length; ++i) {
+        const player = await getSingleFromTable(TABLE_NAMES.player, { playerId: teamPlayers[i].playerId });
+        if(player.jerseyNumber === currentPlayer.jerseyNumber || player.jerseyNumber === "") {
+            continue;
+        }
+        takenNumbers.push(parseInt(player.jerseyNumber));
+    }
+    for(let i = 0; i < retiredNumbers.length; ++i) {
+        takenNumbers.push(parseInt(retiredNumbers[i].jerseyNumber));
+    }
 
+    const availableNumbers = {};
+    for(let i = 1; i < 100; ++i) {
+        if(!takenNumbers.includes(i)) {
+            availableNumbers[i] = i;
+        }
+    }
+
+    return availableNumbers;
+}
+
+function getHeightOptions() {
+    const options = {};
+    for(let i = 5; i < 8; ++i) {
+        for(let j = 0; j < 12; ++j) {
+            const height = `${i}-${j}`;
+            options[height] = height;
+        }
+    }
+    return options;
+}
+
+function getDraftClassOptions(maxYear) {
+    const options = {};
+    for(let i = 1920; i <= maxYear; ++i) {
+        options[i] = i;
+    }
+    return options;
+}
+
+async function getDropdownOptions(tableName, keyId, valId) {
+    const allRows = await getAllFromTable(tableName);
+    const options = Object.assign({}, ...allRows.map(t => ({ [t[keyId]]: t[valId] })));
+    return options;
+}
+
+function appendDropdownRow(form, id, val, options, labelVal) {
     const row = document.createElement("div");
     row.className = "row g-3 align-items-center";
 
@@ -63,7 +120,7 @@ async function appendDropdown(form, id, val, labelVal, tableName, keyId, valId) 
         const option = document.createElement("option");
         option.value = optionValue;
         option.innerText = optionText;
-        if(optionValue === val) {
+        if(optionValue == val) {
             option.selected = true;
         }
         select.appendChild(option);

@@ -19,10 +19,22 @@ async function resetDb() {
     await db.delete();
 }
 
-async function getAllFromTable(tableName) {
+async function getAllFromTable(tableName, filters=null) {
     const db = new Localbase(_dbName);
     const data = await db.collection(tableName).get();
-    return data;
+
+    if(filters === null) {
+        return data;
+    } else {
+        return data.filter(function (v) {
+            for(let [filterKey, filterVal] of Object.entries(filters)) {
+                if(v[filterKey] !== filterVal) {
+                    return false;
+                }
+            }
+            return true;
+        })
+    }
 }
 
 async function getSingleFromTable(tableName, filters) {

@@ -38,12 +38,6 @@ async function initScraper() {
     });
 }
 
-async function showLoadingIndicator(work) {
-    document.getElementById("loading-indicator").style.display = "table";
-    await work();
-    document.getElementById("loading-indicator").style.display = "none";
-}
-
 async function downloadDb() {
     const data = await getAllTables();
     const jsonData = JSON.stringify(data, null, 4);
