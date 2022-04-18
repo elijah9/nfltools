@@ -3,26 +3,15 @@ async function initEditPlayer() {
     const playerId = document.getElementById("player-id").value;
     const player = await getSingleFromTable(TABLE_NAMES.player, { playerId: parseInt(playerId) });
     const currentPlayerTeam = await getSingleFromTable(TABLE_NAMES.playerTeams, { playerId: parseInt(playerId) });
-    
-    const allTeams = await getAllFromTable(TABLE_NAMES.team);
-    const allTeamCodes = Object.assign({}, ...allTeams.map(t => ({[t.teamCode]: t.fullName})));
-    const currentTeamCode = currentPlayerTeam.teamCode;
 
-    const allPositions = await getAllFromTable(TABLE_NAMES.position);
-    const allPosCodes = Object.assign({}, ...allPositions.map(p => ({[p.positionCode]: p.fullName})));
-    const currentPosCode = player.position;
-    
-    const allColleges = await getAllFromTable(TABLE_NAMES.college);
-    const allCollegeOptions = Object.assign({}, ...allColleges.map(c => ({[c.collegeName]: c.collegeName})));
-    const currentCollege = player.college;
-
+    // TODO: way too many parameters in here, clean up somehow
     appendInputRow(form, "firstName", player.firstName, "text", "first name");
     appendInputRow(form, "lastName", player.lastName, "text", "last name");
-    appendInputRow(form, "teamCode", currentTeamCode, "dropdown", "team", allTeamCodes);
-    appendInputRow(form, "position", currentPosCode, "dropdown", "position", allPosCodes);
+    await appendDropdown(form, "teamCode", currentPlayerTeam.teamCode, "team", TABLE_NAMES.team, "teamCode", "fullName");
+    await appendDropdown(form, "position", player.position, "position", TABLE_NAMES.position, "positionCode", "fullName");
     appendInputRow(form, "jerseyNumber", player.jerseyNumber, "number", "jersey number");
     appendInputRow(form, "birthDate", player.birthDate, "date", "birth date");
-    appendInputRow(form, "college", currentCollege, "dropdown", "college", allCollegeOptions);
+    await appendDropdown(form, "college", player.college, "college", TABLE_NAMES.college, "collegeName", "collegeName");
 
     console.log(player);
 
@@ -45,14 +34,52 @@ async function resetEditPlayerForm() {
     }
 }
 
-function appendInputRow(form, id, val, type, labelVal="", options=null) {
-    let input;
-    if(type !== "dropdown") {
-        input = document.createElement("input");
-        input.type = type;
-        input.id = id;
-        input.dataset.originalVal = val;
+async function appendDropdown(form, id, val, labelVal, tableName, keyId, valId) {
+    const allRows = await getAllFromTable(tableName);
+    const options = Object.assign({}, ...allRows.map(t => ({[t[keyId]]: t[valId]})));
+
+    const row = document.createElement("div");
+    row.className = "row g-3 align-items-center";
+
+    const labelDiv = document.createElement("div");
+    labelDiv.className = "col-sm-5";
+
+    const label = document.createElement("label");
+    label.htmlFor = id;
+    label.className = "col-form-label";
+    label.innerText = labelVal;
+    labelDiv.appendChild(label);
+    row.appendChild(labelDiv);
+
+    const inputDiv = document.createElement("div");
+    inputDiv.className = "col-sm-7";
+
+    const select = document.createElement("select");
+    select.id = id;
+    select.dataset.originalVal = val;
+    select.classList = "form-select";
+
+    for(let [optionValue, optionText] of Object.entries(options)) {
+        const option = document.createElement("option");
+        option.value = optionValue;
+        option.innerText = optionText;
+        if(optionValue === val) {
+            option.selected = true;
+        }
+        select.appendChild(option);
     }
+
+    inputDiv.appendChild(select);
+    row.appendChild(inputDiv);
+    row.classList += " row-narrow";
+    form.appendChild(row);
+}
+
+function appendInputRow(form, id, val, type, labelVal="") {
+    const input = document.createElement("input");
+    input.type = type;
+    input.id = id;
+    input.dataset.originalVal = val;
 
     let row;
     if(type === "hidden") {
@@ -74,32 +101,13 @@ function appendInputRow(form, id, val, type, labelVal="", options=null) {
 
         const inputDiv = document.createElement("div");
         inputDiv.className = "col-sm-7";
-        if(type === "dropdown") {
-            const select = document.createElement("select");
-            select.id = id;
-            select.dataset.originalVal = val;
-            select.classList = "form-select";
-
-            for(let [optionValue, optionText] of Object.entries(options)) {
-                const option = document.createElement("option");
-                option.value = optionValue;
-                option.innerText = optionText;
-                if(optionValue === val) {
-                    option.selected = true;
-                }
-                select.appendChild(option);
-            }
-
-            inputDiv.appendChild(select);
-        } else {
-            input.classList = "form-control";
-            if(type === "date") {
-                input.type = "text";
-                input.dataset.provide = "datepicker";
-            }
-            input.value = val;
-            inputDiv.appendChild(input);
+        input.classList = "form-control";
+        if(type === "date") {
+            input.type = "text";
+            input.dataset.provide = "datepicker";
         }
+        input.value = val;
+        inputDiv.appendChild(input);
         
         row.appendChild(inputDiv);
     }

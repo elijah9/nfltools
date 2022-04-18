@@ -83,8 +83,8 @@ async function resetPlayersTable() {
             return pt.playerId === player.playerId;
         })[0];
         const playerRow = document.createElement("tr");
+        playerRow.dataset.rowId = player.playerId;
         
-        const idVal = genHiddenValue(player.playerId);
         const teamVal = genTableData(playerTeam.teamCode);
         const posVal = genTableData(player.position);
         const numVal = genTableData(player.jerseyNumber);
@@ -96,12 +96,10 @@ async function resetPlayersTable() {
         const expVal = genTableData(player.experience);
         const dobVal = genTableData(player.birthDate);
 
-        idVal.className = "player-id";
         teamVal.className = "team-id";
         posVal.className = "position";
         collegeVal.className = "college";
 
-        playerRow.appendChild(idVal);
         playerRow.appendChild(teamVal);
         playerRow.appendChild(posVal);
         playerRow.appendChild(numVal);
@@ -174,7 +172,7 @@ function initContextMenu() {
             contextMenu.style.top = `${normalizedY}px`;
 
             contextMenu.classList.add("visible");
-            contextMenu.dataset.playerId = player.getElementsByClassName("player-id")[0].value;
+            contextMenu.dataset.playerId = player.dataset.rowId;
         });
     }
 
