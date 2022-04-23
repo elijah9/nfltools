@@ -3,7 +3,12 @@ async function initScraper() {
 
     document.getElementById("scrape-button").addEventListener("click", async function (e) {
         document.getElementById("loading-indicator").style.display = "table";
-        fetch("/scraper/data").then(response => response.json()).then(async function(data) {
+        fetch("/scraper/data", {
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        }).then(response => response.json()).then(async function(data) {
             console.log(data);
             
             await writeAllToTable(TABLE_NAMES.team, data.teams);
