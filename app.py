@@ -31,3 +31,6 @@ def edit_player():
     player_id = request.args.get('player_id', type=int)
     title = "edit player"
     return render_template("edit-player.html", title=title, player_id=player_id)
+
+if __name__ == '__main__':
+    app.run()
