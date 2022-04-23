@@ -7,8 +7,8 @@
 {% block content %}
     <h1>{{title}}</h1>
 
-    <form id="edit-player-form" class="outline margin-top hidden">
-        <input id="player-id" type="hidden" value="{{player_id}}">
+    <form id="edit-player-form" class="outline margin-top hidden needs-validation" novalidate>
+        <input id="playerId" type="hidden" value="{{player_id}}" data-input-type="number">
 
         <div id="form-rows"></div>
 

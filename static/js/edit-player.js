@@ -1,8 +1,8 @@
 async function initEditPlayer() {
-    const form = document.getElementById("form-rows");
-    const playerId = document.getElementById("player-id").value;
-    const player = await getSingleFromTable(TABLE_NAMES.player, { playerId: parseInt(playerId) });
-    const currentPlayerTeam = await getSingleFromTable(TABLE_NAMES.playerTeams, { playerId: parseInt(playerId) });
+    const rows = document.getElementById("form-rows");
+    const playerId = parseInt(document.getElementById("playerId").value);
+    const player = await getSingleFromTable(TABLE_NAMES.player, { playerId: playerId });
+    const currentPlayerTeam = await getSingleFromTable(TABLE_NAMES.playerTeams, { playerId: playerId });
 
     const teamOptions = await getDropdownOptions(TABLE_NAMES.team, "teamCode", "fullName");
     const positionOptions = await getDropdownOptions(TABLE_NAMES.position, "positionCode", "fullName");
@@ -12,22 +12,75 @@ async function initEditPlayer() {
     const draftClassOptions = getDraftClassOptions(2022);
 
     // TODO: too many parameters in here, clean up somehow
-    appendInputRow(form, "firstName", player.firstName, "text", "first name");
-    appendInputRow(form, "lastName", player.lastName, "text", "last name");
-    appendDropdownRow(form, "teamCode", currentPlayerTeam.teamCode, teamOptions, "team");
-    appendDropdownRow(form, "position", player.position, positionOptions, "position");
-    appendDropdownRow(form, "jerseyNumber", player.jerseyNumber, numberOptions, "jersey number");
-    appendDropdownRow(form, "height", player.height, heightOptions, "height");
-    appendInputRow(form, "weight", player.weight, "number", "weight");
-    appendInputRow(form, "birthDate", player.birthDate, "date", "birth date");
-    appendDropdownRow(form, "firstYear", player.firstYear, draftClassOptions, "draft class");
-    appendDropdownRow(form, "college", player.college, collegeOptions, "college");
+    appendTextRow(rows, player, "firstName", "first name");
+    appendTextRow(rows, player, "lastName", "last name");
+    appendDropdownRow(rows, currentPlayerTeam, "teamCode", teamOptions, "team");
+    appendDropdownRow(rows, player, "position", positionOptions, "position");
+    appendDropdownRow(rows, player, "jerseyNumber", numberOptions, "jersey number");
+    appendDropdownRow(rows, player, "height", heightOptions, "height");
+    appendNumberRow(rows, player, "weight", "weight");
+    appendDateRow(rows, player, "birthDate", "birth date");
+    appendDropdownRow(rows, player, "firstYear", draftClassOptions, "draft class");
+    appendDropdownRow(rows, player, "college", collegeOptions, "college");
+
+    document.getElementById("teamCode").addEventListener("change", async function () {
+        const teamSelect = document.getElementById("teamCode");
+        const newTeam = {
+            "teamCode": teamSelect.value,
+            "fullName": teamSelect.textContent
+        }
+        const newAvailableNumbers = await getAvailableJerseyNumbers(newTeam, player);
+
+        const numberSelect = document.getElementById("jerseyNumber");
+        replaceDropdownOptions(numberSelect, newAvailableNumbers, numberSelect.value);
+    });
 
     document.getElementById("reset").addEventListener("click", async function () {
         await resetEditPlayerForm();
     });
 
-    document.getElementById("edit-player-form").style.display = "table";
+    const form = document.getElementById("edit-player-form");
+    form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        if(!form.checkValidity()) {
+            e.stopPropagation();
+        } else {
+            await showLoadingIndicator(async function () {
+                // create updated player
+                const updatedPlayer = {};
+                const allInputs = document.querySelectorAll("input, select");
+                for(let i = 0; i < allInputs.length; ++i) {
+                    const input = allInputs[i];
+                    let inputVal = input.value;
+                    if(input.dataset.inputType === "number") {
+                        inputVal = parseInt(inputVal);
+                    }
+                    updatedPlayer[input.id] = inputVal;
+                }
+
+                // update playerTeam if applicable
+                const originalTeam = document.getElementById("teamCode").dataset.originalVal;
+                if(updatedPlayer.teamCode !== originalTeam) {
+                    const updatedTeam = { 
+                        playerId: updatedPlayer.playerId,
+                        teamCode: updatedPlayer.teamCode
+                    };
+                    await updateRow(TABLE_NAMES.playerTeams, { playerId: parseInt(updatedPlayer.playerId) }, updatedTeam);
+                }
+                
+                // submit to db
+                delete updatedPlayer.teamCode;
+                await updateRow(TABLE_NAMES.player, { playerId: parseInt(updatedPlayer.playerId) }, updatedPlayer);
+                
+                location.reload();
+            });
+        }
+
+        form.classList.add("was-validated");
+    });
+
+    form.style.display = "table";
 }
 
 async function resetEditPlayerForm() {
@@ -45,11 +98,14 @@ async function resetEditPlayerForm() {
 }
 
 async function getAvailableJerseyNumbers(team, currentPlayer) {
+    const allPlayers = await getAllFromTable(TABLE_NAMES.player);
     const teamPlayers = await getAllFromTable(TABLE_NAMES.playerTeams, { teamCode: team.teamCode });
     const retiredNumbers = await getAllFromTable(TABLE_NAMES.retiredNumbers, { teamCode: team.teamCode });
     const takenNumbers = [];
     for(let i = 0; i < teamPlayers.length; ++i) {
-        const player = await getSingleFromTable(TABLE_NAMES.player, { playerId: teamPlayers[i].playerId });
+        const player = allPlayers.filter(function (p) {
+            return p.playerId === teamPlayers[i].playerId;
+        })[0];
         if(player.jerseyNumber === currentPlayer.jerseyNumber || player.jerseyNumber === "") {
             continue;
         }
@@ -86,89 +142,4 @@ function getDraftClassOptions(maxYear) {
         options[i] = i;
     }
     return options;
-}
-
-async function getDropdownOptions(tableName, keyId, valId) {
-    const allRows = await getAllFromTable(tableName);
-    const options = Object.assign({}, ...allRows.map(t => ({ [t[keyId]]: t[valId] })));
-    return options;
-}
-
-function appendDropdownRow(form, id, val, options, labelVal) {
-    const row = document.createElement("div");
-    row.className = "row g-3 align-items-center";
-
-    const labelDiv = document.createElement("div");
-    labelDiv.className = "col-sm-5";
-
-    const label = document.createElement("label");
-    label.htmlFor = id;
-    label.className = "col-form-label";
-    label.innerText = labelVal;
-    labelDiv.appendChild(label);
-    row.appendChild(labelDiv);
-
-    const inputDiv = document.createElement("div");
-    inputDiv.className = "col-sm-7";
-
-    const select = document.createElement("select");
-    select.id = id;
-    select.dataset.originalVal = val;
-    select.classList = "form-select";
-
-    for(let [optionValue, optionText] of Object.entries(options)) {
-        const option = document.createElement("option");
-        option.value = optionValue;
-        option.innerText = optionText;
-        if(optionValue == val) {
-            option.selected = true;
-        }
-        select.appendChild(option);
-    }
-
-    inputDiv.appendChild(select);
-    row.appendChild(inputDiv);
-    row.classList += " row-narrow";
-    form.appendChild(row);
-}
-
-function appendInputRow(form, id, val, type, labelVal="") {
-    const input = document.createElement("input");
-    input.type = type;
-    input.id = id;
-    input.dataset.originalVal = val;
-
-    let row;
-    if(type === "hidden") {
-        input.value = val;
-        row = input;
-    } else {
-        row = document.createElement("div");
-        row.className = "row g-3 align-items-center";
-
-        const labelDiv = document.createElement("div");
-        labelDiv.className = "col-sm-5";
-
-        const label = document.createElement("label");
-        label.htmlFor = id;
-        label.className = "col-form-label";
-        label.innerText = labelVal;
-        labelDiv.appendChild(label);
-        row.appendChild(labelDiv);
-
-        const inputDiv = document.createElement("div");
-        inputDiv.className = "col-sm-7";
-        input.classList = "form-control";
-        if(type === "date") {
-            input.type = "text";
-            input.dataset.provide = "datepicker";
-        }
-        input.value = val;
-        inputDiv.appendChild(input);
-        
-        row.appendChild(inputDiv);
-    }
-    
-    row.classList += " row-narrow";
-    form.appendChild(row);
 }

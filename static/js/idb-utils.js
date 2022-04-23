@@ -54,9 +54,13 @@ async function getAllTables() {
 }
 
 async function writeAllToTable(tableName, data) {
-    console.log({tableName, data});
     const db = new Localbase(_dbName);
     for(let i = 0; i < data.length; ++i) {
         await db.collection(tableName).add(data[i]);
     }
+}
+
+async function updateRow(tableName, filters, data) {
+    const db = new Localbase(_dbName);
+    await db.collection(tableName).doc(filters).update(data);
 }

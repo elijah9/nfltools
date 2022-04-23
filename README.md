@@ -2,7 +2,6 @@
 Flask app which ideally should replace everything I currently do in a spreadsheet to keep track of football stuff. Mostly a vehicle for me to have a code project to work on in my spare time.
 
 ## To do
-- Interface for editing player info
 - Web hosting (https://www.pythonanywhere.com/ maybe)
 
 ## Ideas
@@ -16,7 +15,6 @@ Flask app which ideally should replace everything I currently do in a spreadshee
   - This could be used to make it a generic roster editor for any football game like Madden, 2k5, Front Office Football (RIP to the latter two series)
 
 ### Table structure
-- RetiredNumbers to store team ID, jersey number, year retired
 - PlayerRating to store player ID, attribute ID, attribute value
 - RatingAttribute to store attribute ID, attribute name short, attribute name long
 
