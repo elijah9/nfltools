@@ -39,31 +39,31 @@ def convert_pfr_position(pfr_pos):
         return "RB"
     elif p == "FB":
         return "FB"
-    elif p == "WR" or p == "WR/RB" or p == "WR/CB":
+    elif p in ["WR", "WR/RB", "WR/CB"]:
         return "WR"
-    elif p == "TE" or p == "QB/TE":
+    elif p in ["TE", "QB/TE"]:
         return "TE"
-    elif p == "T" or p == "OT" or p == "LT":
+    elif p in ["T", "OT", "LT"]:
         return "T"
-    elif p == "G" or p == "OG" or p == "LG" or p == "OL":
+    elif p in ["G", "OG", "LG", "OL"]:
         return "G"
     elif p == "C":
         return "C"
-    elif p == "DL" or p == "DT" or p == "NT":
+    elif p in ["DL", "DT", "NT"]:
         return "DL"
-    elif p == "EDGE" or p == "DE" or p == "LOLB":
+    elif p in ["EDGE", "DE", "LOLB"]:
         return "EDGE"
-    elif p == "LB" or p == "ILB" or p == "MLB" or p == "LILB" or p == "RILB" or p == "OLB":
+    elif p in ["LB", "ILB", "MLB", "LILB", "RILB", "OLB"]:
         return "LB"
     elif p == "CB":
         return "CB"
-    elif p == "S" or p == "FS" or p == "SS" or p == "DB":
+    elif p in ["S", "SAF", "FS", "SS", "DB"]:
         return "S"
     elif p == "K":
         return "K"
     elif p == "P":
         return "P"
-    elif p == "LS" or p == "LS,TE":
+    elif p in ["LS", "LS,TE"]:
         return "LS"
     elif p == "":
         return "NONE"

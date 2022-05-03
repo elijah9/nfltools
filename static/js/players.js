@@ -169,8 +169,10 @@ function initContextMenu() {
     const editPlayer = document.getElementById("edit-player");
     editPlayer.addEventListener("click", function (e) {
         const playerId = contextMenu.dataset.playerId;
-        const href = editPlayer.dataset.urlTemplate.replaceAll("$", playerId);
-        location.href = href;
+        const a = document.createElement("a");
+        a.href = editPlayer.dataset.urlTemplate.replaceAll("$", playerId);
+        a.target = "_blank";
+        a.click();
     });
 }
 

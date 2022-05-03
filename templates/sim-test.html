@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{title}}
+{% endblock %}
+
+{% block content %}
+    <h1>{{title}}</h1>
+
+    <button type="button" class="btn btn-dark col-auto margin-left" id="simButton">sim a season</button>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/relegation-sim.js') }}"></script>
+    <script>
+        initRelegationSim();
+    </script>
+{% endblock %}

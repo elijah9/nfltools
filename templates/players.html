@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}
-    {{title}}
-{% endblock %}
-
 {% block content %}
     <h1>{{title}}</h1>
+
+    <div class="outline">
+        <a href="{{ url_for('create_player') }}" class="btn btn-dark">add player</a>
+    </div>
 
     <div class="outline auto-width margin-top">
         <div id="roster-filters" class="d-flex justify-content-center">

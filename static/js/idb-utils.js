@@ -53,6 +53,11 @@ async function getAllTables() {
     return data;
 }
 
+async function writeToTable(tableName, data) {
+    const db = new Localbase(_dbName);
+    await db.collection(tableName).add(data);
+}
+
 async function writeAllToTable(tableName, data) {
     const db = new Localbase(_dbName);
     for(let i = 0; i < data.length; ++i) {
@@ -63,4 +68,9 @@ async function writeAllToTable(tableName, data) {
 async function updateRow(tableName, filters, data) {
     const db = new Localbase(_dbName);
     await db.collection(tableName).doc(filters).update(data);
+}
+
+async function deleteRows(tableName, filters={}) {
+    const db = new Localbase(_dbName);
+    await db.collection(tableName).doc(filters).delete();
 }

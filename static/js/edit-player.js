@@ -1,20 +1,43 @@
 async function initEditPlayer() {
     const rows = document.getElementById("form-rows");
-    const playerId = parseInt(document.getElementById("playerId").value);
-    const player = await getSingleFromTable(TABLE_NAMES.player, { playerId: playerId });
-    const currentPlayerTeam = await getSingleFromTable(TABLE_NAMES.playerTeams, { playerId: playerId });
-
+    
     const teamOptions = await getDropdownOptions(TABLE_NAMES.team, "teamCode", "fullName");
     const positionOptions = await getDropdownOptions(TABLE_NAMES.position, "positionCode", "fullName");
     const collegeOptions = await getDropdownOptions(TABLE_NAMES.college, "collegeName", "collegeName");
-    const numberOptions = await getAvailableJerseyNumbers(currentPlayerTeam, player);
     const heightOptions = getHeightOptions();
     const draftClassOptions = getDraftClassOptions(2022);
+
+    let player;
+    const playerId = parseInt(document.getElementById("playerId").value);
+    if(isNaN(playerId)) {
+        // creating new player
+        player = {
+            firstName: "new",
+            lastName: "player",
+            teamCode: Object.keys(teamOptions)[0],
+            position: Object.keys(positionOptions)[0],
+            height: Object.keys(heightOptions)[0],
+            weight: 200,
+            birthDate: "09/09/1995",
+            firstYear: Object.keys(draftClassOptions)[0],
+            college: Object.keys(collegeOptions)[0]
+        };
+    } else {
+        // editing existing player
+        player = await getSingleFromTable(TABLE_NAMES.player, { playerId: playerId });
+        currentPlayerTeam = await getSingleFromTable(TABLE_NAMES.playerTeams, { playerId: playerId });
+        player.teamCode = currentPlayerTeam.teamCode;
+
+        // show delete button
+        document.getElementById("delete-button").style.display = "inline-block";
+    }
+
+    const numberOptions = await getAvailableJerseyNumbers(player);
 
     // TODO: too many parameters in here, clean up somehow
     appendTextRow(rows, player, "firstName", "first name");
     appendTextRow(rows, player, "lastName", "last name");
-    appendDropdownRow(rows, currentPlayerTeam, "teamCode", teamOptions, "team");
+    appendDropdownRow(rows, player, "teamCode", teamOptions, "team");
     appendDropdownRow(rows, player, "position", positionOptions, "position");
     appendDropdownRow(rows, player, "jerseyNumber", numberOptions, "jersey number");
     appendDropdownRow(rows, player, "height", heightOptions, "height");
@@ -24,20 +47,17 @@ async function initEditPlayer() {
     appendDropdownRow(rows, player, "college", collegeOptions, "college");
 
     document.getElementById("teamCode").addEventListener("change", async function () {
-        const teamSelect = document.getElementById("teamCode");
-        const newTeam = {
-            "teamCode": teamSelect.value,
-            "fullName": teamSelect.textContent
-        }
-        const newAvailableNumbers = await getAvailableJerseyNumbers(newTeam, player);
+        player.teamCode = teamSelect.value;
+        const newAvailableNumbers = await getAvailableJerseyNumbers(player);
 
         const numberSelect = document.getElementById("jerseyNumber");
         replaceDropdownOptions(numberSelect, newAvailableNumbers, numberSelect.value);
     });
 
-    document.getElementById("reset").addEventListener("click", async function () {
-        await resetEditPlayerForm();
-    });
+    document.getElementById("reset-button").addEventListener("click", resetEditPlayerForm);
+    document.getElementById("delete-button").addEventListener("click", promptDeletePlayer);
+    document.getElementById("confirm-delete-button").addEventListener("click", deletePlayer);
+    document.getElementById("cancel-delete-button").addEventListener("click", cancelDeletePlayer);
 
     const form = document.getElementById("edit-player-form");
     form.addEventListener("submit", async function (e) {
@@ -46,35 +66,7 @@ async function initEditPlayer() {
         if(!form.checkValidity()) {
             e.stopPropagation();
         } else {
-            await showLoadingIndicator(async function () {
-                // create updated player
-                const updatedPlayer = {};
-                const allInputs = document.querySelectorAll("input, select");
-                for(let i = 0; i < allInputs.length; ++i) {
-                    const input = allInputs[i];
-                    let inputVal = input.value;
-                    if(input.dataset.inputType === "number") {
-                        inputVal = parseInt(inputVal);
-                    }
-                    updatedPlayer[input.id] = inputVal;
-                }
-
-                // update playerTeam if applicable
-                const originalTeam = document.getElementById("teamCode").dataset.originalVal;
-                if(updatedPlayer.teamCode !== originalTeam) {
-                    const updatedTeam = { 
-                        playerId: updatedPlayer.playerId,
-                        teamCode: updatedPlayer.teamCode
-                    };
-                    await updateRow(TABLE_NAMES.playerTeams, { playerId: parseInt(updatedPlayer.playerId) }, updatedTeam);
-                }
-                
-                // submit to db
-                delete updatedPlayer.teamCode;
-                await updateRow(TABLE_NAMES.player, { playerId: parseInt(updatedPlayer.playerId) }, updatedPlayer);
-                
-                location.reload();
-            });
+            await showLoadingIndicator(submitEditPlayerForm);
         }
 
         form.classList.add("was-validated");
@@ -97,10 +89,72 @@ async function resetEditPlayerForm() {
     }
 }
 
-async function getAvailableJerseyNumbers(team, currentPlayer) {
+async function submitEditPlayerForm() {
+    const updatedPlayer = getPlayerFromForm();
+
+    if(isNaN(updatedPlayer.playerId)) {
+        // creating new player
+
+        // calculate new playerId
+        const allPlayers = await getAllFromTable(TABLE_NAMES.player);
+        const maxPlayerId = allPlayers.reduce(function (p, c) {
+            return (p.playerId > c.playerId) ? p : c;
+        }).playerId;
+        updatedPlayer.playerId = maxPlayerId + 1;
+
+        // create playerTeam
+        const updatedTeam = { 
+            playerId: updatedPlayer.playerId,
+            teamCode: updatedPlayer.teamCode
+        };
+        await writeToTable(TABLE_NAMES.playerTeams, updatedTeam);
+
+        // create player
+        delete updatedPlayer.teamCode;
+        await writeToTable(TABLE_NAMES.player, updatedPlayer);
+
+        document.getElementById("playersHref").click();
+    } else {
+        // updating existing player
+
+        // update playerTeam if applicable
+        const originalTeam = document.getElementById("teamCode").dataset.originalVal;
+        if(updatedPlayer.teamCode !== originalTeam) {
+            const updatedTeam = { 
+                playerId: updatedPlayer.playerId,
+                teamCode: updatedPlayer.teamCode
+            };
+            await updateRow(TABLE_NAMES.playerTeams, { playerId: parseInt(updatedPlayer.playerId) }, updatedTeam);
+        }
+        
+        // submit to db
+        delete updatedPlayer.teamCode;
+        await updateRow(TABLE_NAMES.player, { playerId: parseInt(updatedPlayer.playerId) }, updatedPlayer);
+
+        location.reload();
+    }
+}
+
+function getPlayerFromForm() {
+    // create updated player
+    const updatedPlayer = {};
+    const allInputs = document.querySelectorAll("input, select");
+    for(let i = 0; i < allInputs.length; ++i) {
+        const input = allInputs[i];
+        let inputVal = input.value;
+        if(input.dataset.inputType === "number") {
+            inputVal = parseInt(inputVal);
+        }
+        updatedPlayer[input.id] = inputVal;
+    }
+    console.log(updatedPlayer);
+    return updatedPlayer;
+}
+
+async function getAvailableJerseyNumbers(currentPlayer) {
     const allPlayers = await getAllFromTable(TABLE_NAMES.player);
-    const teamPlayers = await getAllFromTable(TABLE_NAMES.playerTeams, { teamCode: team.teamCode });
-    const retiredNumbers = await getAllFromTable(TABLE_NAMES.retiredNumbers, { teamCode: team.teamCode });
+    const teamPlayers = await getAllFromTable(TABLE_NAMES.playerTeams, { teamCode: currentPlayer.teamCode });
+    const retiredNumbers = await getAllFromTable(TABLE_NAMES.retiredNumbers, { teamCode: currentPlayer.teamCode });
     const takenNumbers = [];
     for(let i = 0; i < teamPlayers.length; ++i) {
         const player = allPlayers.filter(function (p) {
@@ -142,4 +196,24 @@ function getDraftClassOptions(maxYear) {
         options[i] = i;
     }
     return options;
+}
+
+function promptDeletePlayer() {
+    document.getElementById("delete-prompt").style.display = "block";
+    document.getElementById("form-buttons").style.display = "none";
+}
+
+async function deletePlayer() {
+    document.getElementById("delete-prompt").style.display = "none";
+
+    const player = getPlayerFromForm();
+    await deleteRows(TABLE_NAMES.player, { playerId: player.playerId });
+    await deleteRows(TABLE_NAMES.playerTeams, { playerId: player.playerId });
+
+    document.getElementById("playersHref").click();
+}
+
+async function cancelDeletePlayer() {
+    document.getElementById("delete-prompt").style.display = "none";
+    document.getElementById("form-buttons").style.display = "block";
 }
