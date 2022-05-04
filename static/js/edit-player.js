@@ -239,6 +239,5 @@ function redirectToRoster(player) {
     const teamCode = document.getElementById("teamCode").value;
     const a = document.createElement("a");
     a.href = hrefTemplate.replace("$team", teamCode).replace("$pos", player.position);
-    a.target = "_blank";
     a.click();
 }

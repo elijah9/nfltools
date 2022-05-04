@@ -183,6 +183,12 @@ function initContextMenu() {
         const playerId = contextMenu.dataset.playerId;
         const a = document.createElement("a");
         a.href = editPlayer.dataset.urlTemplate.replaceAll("$", playerId);
+        a.click();
+    });
+    editPlayer.addEventListener("auxclick", function (e) {
+        const playerId = contextMenu.dataset.playerId;
+        const a = document.createElement("a");
+        a.href = editPlayer.dataset.urlTemplate.replaceAll("$", playerId);
         a.target = "_blank";
         a.click();
     });
