@@ -1,13 +1,15 @@
 # nfltools
 Flask app which ideally should replace everything I currently do in a spreadsheet to keep track of football stuff. Mostly a vehicle for me to have a code project to work on in my spare time.
 
-Currently hosted at http://twinprincess.pythonanywhere.com/, but the scraping doesn't work from there (at least it can be somewhat useful still with JSON imports).
+Currently hosted at http://twinprincess.pythonanywhere.com/, but the scraping doesn't work from there (at least it can be somewhat useful still with JSON imports). I probably won't be very proactive about pulling code updates to the server.
 
 ## To do
+- More scraping options
+  - Update existing db
+  - Replace existing db
 - Basic player rating system
   - Random generation taking center of ratings distribution (60-99 for NFL meaning 80 is center) and weighing less as ratings increase
 - Roster cut tool
-- Allow assignment of duplicate jersey numbers on different team units
 - Basic simulation
   - Make very basic relegation system where season league rankings are randomized weighted on average player rating
     - Worst 5 players on promoted teams would be cut, best 5 players on relegated teams would replace them

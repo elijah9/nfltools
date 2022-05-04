@@ -9,7 +9,7 @@
 
     <form id="edit-player-form" class="outline margin-top hidden needs-validation" novalidate>
         <input id="playerId" type="hidden" value="{{player_id}}" data-input-type="number">
-        <a id="playersHref" class="hidden" href="{{ url_for('players') }}"></a>
+        <a id="playersHref" class="hidden" href="{{ url_for('players', team='$team', position='$pos') }}"></a>
 
         <div id="form-rows"></div>
 

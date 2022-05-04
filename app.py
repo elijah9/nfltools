@@ -23,8 +23,10 @@ def scrape_teams():
 
 @app.route("/players")
 def players():
+    team_code = request.args.get("team", type=str)
+    position_code = request.args.get("position", type=str)
     title = "players"
-    return render_template("players.html", title=title)
+    return render_template("players.html", title=title, team_code=team_code, position_code=position_code)
 
 
 @app.route("/edit-player")

@@ -1,3 +1,7 @@
+function isEmptyOrSpaces(str){
+    return str === null || str.match(/^ *$/) !== null;
+}
+
 function appendTableData(parent, cellVal, className=null) {
     const cell = document.createElement("td");
     cell.innerText = cellVal;

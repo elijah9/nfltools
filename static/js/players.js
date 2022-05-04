@@ -1,7 +1,19 @@
 async function initPlayers() {
     await resetScrapedData();
-    initFilters();
+
+    const allFilters = document.querySelectorAll("#roster-filters > select");
+    initFilters(allFilters);
     initContextMenu();
+
+    const teamParam = document.getElementById("team-param").value;
+    const positionParam = document.getElementById("position-param").value;
+    if(!(isEmptyOrSpaces(teamParam) || teamParam === "None")) {
+        document.getElementById("teams-filter").value = teamParam;
+    }
+    if(!(isEmptyOrSpaces(positionParam) || positionParam === "None")) {
+        document.getElementById("position-filter").value = positionParam;
+    }
+    filterPlayers(allFilters);
 }
 
 async function resetScrapedData() {
@@ -101,8 +113,7 @@ async function resetPlayersTable() {
     }
 }
 
-function initFilters() {
-    const allFilters = document.querySelectorAll("#roster-filters > select");
+function initFilters(allFilters) {
     for(let i = 0; i < allFilters.length; ++i) {
         const filter = allFilters[i];
         filter.addEventListener("change", function () { filterPlayers(allFilters); });
@@ -110,6 +121,7 @@ function initFilters() {
 }
 
 function filterPlayers(allFilters) {
+    console.log(allFilters);
     document.getElementById("roster-table").style.display = "none";
     document.getElementById("loading-indicator").style.display = "table";
     

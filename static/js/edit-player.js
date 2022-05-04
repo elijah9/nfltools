@@ -32,13 +32,12 @@ async function initEditPlayer() {
         document.getElementById("delete-button").style.display = "inline-block";
     }
 
-    const numberOptions = await getAvailableJerseyNumbers(player);
-
     // TODO: too many parameters in here, clean up somehow
     appendTextRow(rows, player, "firstName", "first name");
     appendTextRow(rows, player, "lastName", "last name");
     appendDropdownRow(rows, player, "teamCode", teamOptions, "team");
     appendDropdownRow(rows, player, "position", positionOptions, "position");
+    const numberOptions = await getAvailableJerseyNumbers(player);
     appendDropdownRow(rows, player, "jerseyNumber", numberOptions, "jersey number");
     appendDropdownRow(rows, player, "height", heightOptions, "height");
     appendNumberRow(rows, player, "weight", "weight");
@@ -47,9 +46,14 @@ async function initEditPlayer() {
     appendDropdownRow(rows, player, "college", collegeOptions, "college");
 
     document.getElementById("teamCode").addEventListener("change", async function () {
-        player.teamCode = teamSelect.value;
+        player.teamCode = document.getElementById("teamCode").value;
         const newAvailableNumbers = await getAvailableJerseyNumbers(player);
+        const numberSelect = document.getElementById("jerseyNumber");
+        replaceDropdownOptions(numberSelect, newAvailableNumbers, numberSelect.value);
+    });
 
+    document.getElementById("position").addEventListener("change", async function () {
+        const newAvailableNumbers = await getAvailableJerseyNumbers(player);
         const numberSelect = document.getElementById("jerseyNumber");
         replaceDropdownOptions(numberSelect, newAvailableNumbers, numberSelect.value);
     });
@@ -112,8 +116,6 @@ async function submitEditPlayerForm() {
         // create player
         delete updatedPlayer.teamCode;
         await writeToTable(TABLE_NAMES.player, updatedPlayer);
-
-        document.getElementById("playersHref").click();
     } else {
         // updating existing player
 
@@ -130,9 +132,9 @@ async function submitEditPlayerForm() {
         // submit to db
         delete updatedPlayer.teamCode;
         await updateRow(TABLE_NAMES.player, { playerId: parseInt(updatedPlayer.playerId) }, updatedPlayer);
-
-        location.reload();
     }
+
+    redirectToRoster(updatedPlayer);
 }
 
 function getPlayerFromForm() {
@@ -151,7 +153,12 @@ function getPlayerFromForm() {
     return updatedPlayer;
 }
 
+// TODO: make sure this gets called when position or team change
 async function getAvailableJerseyNumbers(currentPlayer) {
+    const currentPosCode = document.getElementById("position").value;
+    const allPositions = await getAllFromTable(TABLE_NAMES.position);
+    const currentPos = allPositions.filter(function (p) { return p.positionCode === currentPosCode; })[0];
+    const currentUnit = currentPos.unit;
     const allPlayers = await getAllFromTable(TABLE_NAMES.player);
     const teamPlayers = await getAllFromTable(TABLE_NAMES.playerTeams, { teamCode: currentPlayer.teamCode });
     const retiredNumbers = await getAllFromTable(TABLE_NAMES.retiredNumbers, { teamCode: currentPlayer.teamCode });
@@ -160,7 +167,16 @@ async function getAvailableJerseyNumbers(currentPlayer) {
         const player = allPlayers.filter(function (p) {
             return p.playerId === teamPlayers[i].playerId;
         })[0];
-        if(player.jerseyNumber === currentPlayer.jerseyNumber || player.jerseyNumber === "") {
+        const unit = allPositions.filter(function(p) {
+            return p.positionCode === player.position;
+        })[0].unit;
+
+        // check if player's jersey number is blank
+        if(player.jerseyNumber === "" 
+            // otherwise, allow if the edited player already has this number
+            || player.jerseyNumber === currentPlayer.jerseyNumber 
+            // also allow if player is on a different unit
+            || unit !== currentUnit) {
             continue;
         }
         takenNumbers.push(parseInt(player.jerseyNumber));
@@ -169,7 +185,7 @@ async function getAvailableJerseyNumbers(currentPlayer) {
         takenNumbers.push(parseInt(retiredNumbers[i].jerseyNumber));
     }
 
-    const availableNumbers = {};
+    const availableNumbers = { "": "" };
     for(let i = 1; i < 100; ++i) {
         if(!takenNumbers.includes(i)) {
             availableNumbers[i] = i;
@@ -210,10 +226,19 @@ async function deletePlayer() {
     await deleteRows(TABLE_NAMES.player, { playerId: player.playerId });
     await deleteRows(TABLE_NAMES.playerTeams, { playerId: player.playerId });
 
-    document.getElementById("playersHref").click();
+    redirectToRoster(player);
 }
 
 async function cancelDeletePlayer() {
     document.getElementById("delete-prompt").style.display = "none";
     document.getElementById("form-buttons").style.display = "block";
+}
+
+function redirectToRoster(player) {
+    const hrefTemplate = document.getElementById("playersHref").href;
+    const teamCode = document.getElementById("teamCode").value;
+    const a = document.createElement("a");
+    a.href = hrefTemplate.replace("$team", teamCode).replace("$pos", player.position);
+    a.target = "_blank";
+    a.click();
 }

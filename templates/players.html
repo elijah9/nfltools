@@ -3,6 +3,9 @@
 {% block content %}
     <h1>{{title}}</h1>
 
+    <input id="team-param" type="hidden" value="{{team_code}}">
+    <input id="position-param" type="hidden" value="{{position_code}}">
+
     <div class="outline">
         <a href="{{ url_for('create_player') }}" class="btn btn-dark">add player</a>
     </div>
