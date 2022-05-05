@@ -28,11 +28,10 @@ def scrape_league(year):
         
         team_players = scrape_team_players(team_code, year)
         for player in team_players:
-            player["playerId"] = i
             all_players.append(player)
             player_teams.append({
                 "teamCode": standardized_team_code,
-                "playerId": i,
+                "playerId": player["playerId"],
             })
 
             college = player["college"].strip()

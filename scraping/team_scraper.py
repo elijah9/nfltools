@@ -49,8 +49,9 @@ def scrape_team_players(team_code, year):
     
     team_players = []
     for row in roster_rows:
-        player = scrape_player(row, year)
-        team_players.append(player)
+        if row.select('td[data-stat="player"]')[0].has_attr("data-append-csv"):
+            player = scrape_player(row, year)
+            team_players.append(player)
     return team_players
 
 # TODO: saints page does not contain retired numbers

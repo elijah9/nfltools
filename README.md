@@ -4,9 +4,12 @@ Flask app which ideally should replace everything I currently do in a spreadshee
 Currently hosted at http://twinprincess.pythonanywhere.com/, but the scraping doesn't work from there (at least it can be somewhat useful still with JSON imports). I probably won't be very proactive about pulling code updates to the server.
 
 ## To do
-- More scraping options
-  - Update existing db
-  - Replace existing db
+- Update scraper to give same new options but for JSON uploads
+- List views and edit ability for remaining tables
+  - Teams
+  - Positions
+  - Colleges
+  - Retired numbers
 - Basic player rating system
   - Random generation taking center of ratings distribution (60-99 for NFL meaning 80 is center) and weighing less as ratings increase
 - Roster cut tool

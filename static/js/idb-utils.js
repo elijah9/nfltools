@@ -70,7 +70,12 @@ async function updateRow(tableName, filters, data) {
     await db.collection(tableName).doc(filters).update(data);
 }
 
-async function deleteRows(tableName, filters={}) {
+async function deleteRows(tableName, filters) {
     const db = new Localbase(_dbName);
     await db.collection(tableName).doc(filters).delete();
+}
+
+async function clearTable(tableName) {
+    const db = new Localbase(_dbName);
+    await db.collection(tableName).delete();
 }

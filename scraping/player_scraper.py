@@ -1,5 +1,6 @@
 def scrape_player(row_soup, year):
     jersey_number = row_soup.select('th[data-stat="uniform_number"]')[0].text
+    player_id = row_soup.select('td[data-stat="player"]')[0]["data-append-csv"]
     full_name = row_soup.select('td[data-stat="player"]')[0]["csk"]
     last_name, first_name = full_name.split(",")
     position = row_soup.select('td[data-stat="pos"]')[0].text
@@ -18,6 +19,7 @@ def scrape_player(row_soup, year):
         last_college = "None"
 
     return {
+        "playerId": player_id,
         "lastName": last_name,
         "firstName": first_name,
         "jerseyNumber": jersey_number,

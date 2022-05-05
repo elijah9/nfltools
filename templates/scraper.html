@@ -4,14 +4,20 @@
     <h1>{{title}}</h1>
 
     <div id="scraper-buttons" class="outline">
-        <button type="button" class="btn btn-primary" id="scrape-button">scrape</button>
-        <button type="button" class="btn btn-dark" id="reset-db-button">reset db</button>
-        <button type="button" class="btn btn-dark" id="download-db-button">download db (json)</button>
-        <button type="button" class="btn btn-dark" id="download-players-button">download players (csv)</button>
+        <div>
+            <button type="button" class="btn btn-primary" id="scrape-add-button">add</button>
+            <button type="button" class="btn btn-primary" id="scrape-update-button">update/merge</button>
+            <button type="button" class="btn btn-primary" id="scrape-replace-button">replace</button>
+            <button type="button" class="btn btn-danger" id="reset-db-button">delete</button>
+        </div>
     </div>
 
     <div id="import-controls" class="outline margin-top">
-        <input class="form-control form-control-sm" id="import-file" type="file" accept=".json,text/json,application/json">
+        <div>
+            <button type="button" class="btn btn-dark" id="download-db-button">download db (json)</button>
+            <button type="button" class="btn btn-dark" id="download-players-button">download players (csv)</button>
+        </div>
+        <input class="form-control form-control-sm margin-top" id="import-file" type="file" accept=".json,text/json,application/json">
         <div class="margin-top">
             <div style="width: 10rem; display: inline-block;">
                 <b class="import-status" style="color: red;">no data uploaded</b>

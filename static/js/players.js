@@ -121,7 +121,6 @@ function initFilters(allFilters) {
 }
 
 function filterPlayers(allFilters) {
-    console.log(allFilters);
     document.getElementById("roster-table").style.display = "none";
     document.getElementById("loading-indicator").style.display = "table";
     

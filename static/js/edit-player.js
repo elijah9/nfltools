@@ -8,17 +8,17 @@ async function initEditPlayer() {
     const draftClassOptions = getDraftClassOptions(2022);
 
     let player;
-    const playerId = parseInt(document.getElementById("playerId").value);
-    if(isNaN(playerId)) {
+    const playerId = document.getElementById("playerId").value;
+    if(isEmptyOrSpaces(playerId)) {
         // creating new player
         player = {
-            firstName: "new",
-            lastName: "player",
+            firstName: "",
+            lastName: "",
             teamCode: Object.keys(teamOptions)[0],
             position: Object.keys(positionOptions)[0],
             height: Object.keys(heightOptions)[0],
-            weight: 200,
-            birthDate: "09/09/1995",
+            weight: 0,
+            birthDate: "",
             firstYear: Object.keys(draftClassOptions)[0],
             college: Object.keys(collegeOptions)[0]
         };
@@ -96,15 +96,27 @@ async function resetEditPlayerForm() {
 async function submitEditPlayerForm() {
     const updatedPlayer = getPlayerFromForm();
 
-    if(isNaN(updatedPlayer.playerId)) {
+    if(isEmptyOrSpaces(updatedPlayer.playerId)) {
         // creating new player
 
         // calculate new playerId
-        const allPlayers = await getAllFromTable(TABLE_NAMES.player);
-        const maxPlayerId = allPlayers.reduce(function (p, c) {
-            return (p.playerId > c.playerId) ? p : c;
-        }).playerId;
-        updatedPlayer.playerId = maxPlayerId + 1;
+        // TODO: would be ideal if highest suffix for prefix could be found
+        //       because lots of players with 00/01 prefixes are retired
+        //       and would clash if we decided to bring in historical data
+        let newPlayerIdSuffix = 0;
+        let newPlayerId;
+        while(!newPlayerId) {
+            const possibleId = updatedPlayer.lastName.slice(0, 4) + updatedPlayer.firstName.slice(0, 2) 
+                + String(newPlayerIdSuffix).padStart(2, '0');
+
+            const idConflict = await getSingleFromTable(TABLE_NAMES.player, { playerId: possibleId });
+            if(idConflict) {
+                ++newPlayerIdSuffix;
+            } else {
+                newPlayerId = possibleId;
+            }
+        }
+        updatedPlayer.playerId = newPlayerId;
 
         // create playerTeam
         const updatedTeam = { 
@@ -126,12 +138,12 @@ async function submitEditPlayerForm() {
                 playerId: updatedPlayer.playerId,
                 teamCode: updatedPlayer.teamCode
             };
-            await updateRow(TABLE_NAMES.playerTeams, { playerId: parseInt(updatedPlayer.playerId) }, updatedTeam);
+            await updateRow(TABLE_NAMES.playerTeams, { playerId: updatedPlayer.playerId }, updatedTeam);
         }
         
         // submit to db
         delete updatedPlayer.teamCode;
-        await updateRow(TABLE_NAMES.player, { playerId: parseInt(updatedPlayer.playerId) }, updatedPlayer);
+        await updateRow(TABLE_NAMES.player, { playerId: updatedPlayer.playerId }, updatedPlayer);
     }
 
     redirectToRoster(updatedPlayer);
@@ -149,7 +161,6 @@ function getPlayerFromForm() {
         }
         updatedPlayer[input.id] = inputVal;
     }
-    console.log(updatedPlayer);
     return updatedPlayer;
 }
 

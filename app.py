@@ -31,7 +31,7 @@ def players():
 
 @app.route("/edit-player")
 def edit_player():
-    player_id = request.args.get('player_id', type=int)
+    player_id = request.args.get('player_id', type=str)
     title = "edit player"
     return render_template("edit-player.html", title=title, player_id=player_id)
 

@@ -1,31 +1,18 @@
-async function initScraper() {
-    document.getElementById("scraper-buttons").style.display = "block";
-
-    document.getElementById("scrape-button").addEventListener("click", async function (e) {
-        document.getElementById("loading-indicator").style.display = "table";
-        fetch("/scraper/data", {
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            }
-        }).then(response => response.json()).then(async function(data) {
-            console.log(data);
-            
-            await writeAllToTable(TABLE_NAMES.team, data.teams);
-            await writeAllToTable(TABLE_NAMES.player, data.players);
-            await writeAllToTable(TABLE_NAMES.playerTeams, data.playerTeams);
-            await writeAllToTable(TABLE_NAMES.retiredNumbers, data.retiredNumbers);
-            await writeAllToTable(TABLE_NAMES.position, data.positions);
-            await writeAllToTable(TABLE_NAMES.college, data.colleges);
-
-            document.getElementById("loading-indicator").style.display = "none";
-        });
+function initScraper() {
+    initScrapeButton("scrape-add-button", async function (data) {
+        await writeAllData(data);
+    });
+    initScrapeButton("scrape-replace-button", async function (data) {
+        await resetDb();
+        await writeAllData(data);
+    });
+    initScrapeButton("scrape-update-button", async function (data) {
+        await updateAllData(data);
     });
 
     document.getElementById("reset-db-button").addEventListener("click", async function (e) {
         await showLoadingIndicator(async function () {
             await resetDb();
-            location.reload();
         });
     });
 
@@ -41,6 +28,90 @@ async function initScraper() {
     document.getElementById("import-button").addEventListener("click", async function (e) {
         await showLoadingIndicator(importJsonToDb);
     });
+}
+
+function initScrapeButton(id, callback) {
+    document.getElementById(id).addEventListener("click", async function (e) {
+        document.getElementById("loading-indicator").style.display = "table";
+        fetch("/scraper/data", {
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        }).then(response => response.json()).then(async function(data) {
+            console.log(data);
+            await callback(data);
+            document.getElementById("loading-indicator").style.display = "none";
+        });
+    });
+}
+
+async function writeAllData(data) {
+    await writeAllToTable(TABLE_NAMES.team, data.teams);
+    await writeAllToTable(TABLE_NAMES.player, data.players);
+    await writeAllToTable(TABLE_NAMES.playerTeams, data.playerTeams);
+    await writeAllToTable(TABLE_NAMES.retiredNumbers, data.retiredNumbers);
+    await writeAllToTable(TABLE_NAMES.position, data.positions);
+    await writeAllToTable(TABLE_NAMES.college, data.colleges);
+}
+
+async function updateAllData(data) {
+    // for efficiency, do players and player teams with the same iterator
+    const allPlayers = await getAllFromTable(TABLE_NAMES.player);
+    const allPlayerTeams = await getAllFromTable(TABLE_NAMES.playerTeams);
+    console.log(allPlayerTeams);
+    const dataPlayers = data.players;
+    for(let i = 0; i < dataPlayers.length; ++i) {
+        const row = dataPlayers[i];
+        const filter = { playerId: row.playerId };
+        const playerMatch = allPlayers.filter(function (p) { return p.playerId === row.playerId})[0];
+        const teamMatch = allPlayerTeams.filter(function (t) { return t.playerId === row.playerId})[0];
+        if(playerMatch) {
+            if(!shallowEqual(playerMatch, row)) {
+                console.log("updating player: " + row.playerId);
+                await updateRow(TABLE_NAMES.player, filter, row);
+            }
+        } else {
+            await writeToTable(row);
+        }
+        if(teamMatch) {
+            const dataTeam = data.playerTeams.filter(function (t) { return t.playerId === row.playerId; })[0];
+            if(!shallowEqual(teamMatch, dataTeam)) {
+                console.log("updating player team: " + dataTeam.playerId);
+                await updateRow(TABLE_NAMES.playerTeams, filter, dataTeam);
+            }
+        } else {
+            await writeToTable(row);
+        }
+    }
+
+    await updateTableData(data.teams, TABLE_NAMES.team, "teamCode");
+    await updateTableData(data.positions, TABLE_NAMES.position, "positionCode");
+    await updateTableData(data.colleges, TABLE_NAMES.college, "collegeName");
+
+    // can't update retired numbers because no unique key (my bad)
+    await clearTable(TABLE_NAMES.retiredNumbers);
+    await writeAllToTable(TABLE_NAMES.retiredNumbers, data.retiredNumbers);
+}
+
+async function updateTableData(tableData, tableName, idCol) {
+    const allExistingRows = await getAllFromTable(tableName);
+
+    for(let i = 0; i < tableData.length; ++i) {
+        const row = tableData[i];
+        const filter = { };
+        filter[idCol] = row[idCol];
+
+        const match = allExistingRows.filter(function (r) { return r[idCol] === row[idCol]})[0];
+        if(match) {
+            if(!shallowEqual(match, row)) {
+                console.log("updating " + tableName + " " + row[idCol]);
+                await updateRow(tableName, filter, row);
+            }
+        } else {
+            await writeToTable(row);
+        }
+    }
 }
 
 async function downloadDb() {
