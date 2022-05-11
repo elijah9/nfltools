@@ -49,10 +49,10 @@ def scrape_league(year):
 
     all_colleges.sort(key=lambda c: c["collegeName"])
     return {
-        "teams": all_teams,
-        "players": all_players,
+        "team": all_teams,
+        "player": all_players,
         "playerTeams": player_teams,
         "retiredNumbers": all_retired_numbers,
-        "positions": POSITIONS,
-        "colleges": all_colleges
+        "position": POSITIONS,
+        "college": all_colleges
     }

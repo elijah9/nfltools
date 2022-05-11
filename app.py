@@ -11,12 +11,12 @@ def home():
     title = "nfltools"
     return render_template("index.html", title=title)
 
-@app.route("/scraper")
-def scraper():
-    title = "scraper"
-    return render_template("scraper.html", title=title)
+@app.route("/data")
+def data():
+    title = "manage data"
+    return render_template("data.html", title=title)
 
-@app.route("/scraper/data")
+@app.route("/data/scrape")
 def scrape_teams():
     year = 2022
     return scrape_league(year)

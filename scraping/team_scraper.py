@@ -29,7 +29,7 @@ def standardize_team_code(team_code):
 def scrape_team(team_code, year):
     # get info from roster page for given year
     roster_soup = scrape_team_roster(team_code, year)
-    team_name_full = roster_soup.select('h1[itemprop="name"]')[0].find_all("span")[1].text
+    team_name_full = roster_soup.select('#meta h1')[0].find_all("span")[1].text
     standardized_team_code = standardize_team_code(team_code)
 
     print(f"{standardized_team_code} - {team_name_full}")

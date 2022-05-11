@@ -74,7 +74,7 @@ def convert_pfr_position(pfr_pos):
 
 def convert_pfr_experience(year, pfr_exp):
     if "Rook" in pfr_exp:
-        experience = 1
+        experience = 0
     else:
         experience = int(pfr_exp)
     

@@ -4,7 +4,10 @@ Flask app which ideally should replace everything I currently do in a spreadshee
 Currently hosted at http://twinprincess.pythonanywhere.com/, but the scraping doesn't work from there (at least it can be somewhat useful still with JSON imports). I probably won't be very proactive about pulling code updates to the server.
 
 ## To do
-- Update scraper to give same new options but for JSON uploads
+- Scraper
+  - Allow user to filter JSON download, possibly also upload
+    - Table
+    - Team
 - List views and edit ability for remaining tables
   - Teams
   - Positions

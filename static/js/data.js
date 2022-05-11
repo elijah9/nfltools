@@ -1,12 +1,12 @@
-function initScraper() {
-    initScrapeButton("scrape-add-button", async function (data) {
+function initData() {
+    initImportButton("import-add-button", async function (data) {
         await writeAllData(data);
     });
-    initScrapeButton("scrape-replace-button", async function (data) {
+    initImportButton("import-replace-button", async function (data) {
         await resetDb();
         await writeAllData(data);
     });
-    initScrapeButton("scrape-update-button", async function (data) {
+    initImportButton("import-update-button", async function (data) {
         await updateAllData(data);
     });
 
@@ -25,34 +25,51 @@ function initScraper() {
     });
 
     document.getElementById("import-file").addEventListener("change", validateDbJson);
-    document.getElementById("import-button").addEventListener("click", async function (e) {
-        await showLoadingIndicator(importJsonToDb);
-    });
 }
 
-function initScrapeButton(id, callback) {
+function initImportButton(id, callback) {
     document.getElementById(id).addEventListener("click", async function (e) {
         document.getElementById("loading-indicator").style.display = "table";
-        fetch("/scraper/data", {
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
+
+        const importModeNode = document.querySelector('input[name="data-sources"]:checked');
+        if(importModeNode) {
+            const importMode = importModeNode.value;
+            if(importMode === "scrape-pfr") {
+                fetch("/data/scrape", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    }
+                }).then(response => response.json()).then(async function(data) {
+                    console.log(data);
+                    await callback(data);
+                    document.getElementById("loading-indicator").style.display = "none";
+                });
+            } else if(importMode === "upload-json") {
+                const input = document.getElementById("import-file");
+                try {
+                    const file = input.files[0];
+                    const reader = new FileReader();
+                    reader.onload = async function(e) {
+                        const fileJson = e.target.result;
+                        const fileObj = JSON.parse(fileJson);
+                        await callback(fileObj);
+                        document.getElementById("loading-indicator").style.display = "none";
+                    }
+
+                    reader.readAsText(file, "UTF-8");
+                } catch(error) {
+                    console.log(error);
+                }
             }
-        }).then(response => response.json()).then(async function(data) {
-            console.log(data);
-            await callback(data);
-            document.getElementById("loading-indicator").style.display = "none";
-        });
+        }
     });
 }
 
 async function writeAllData(data) {
-    await writeAllToTable(TABLE_NAMES.team, data.teams);
-    await writeAllToTable(TABLE_NAMES.player, data.players);
-    await writeAllToTable(TABLE_NAMES.playerTeams, data.playerTeams);
-    await writeAllToTable(TABLE_NAMES.retiredNumbers, data.retiredNumbers);
-    await writeAllToTable(TABLE_NAMES.position, data.positions);
-    await writeAllToTable(TABLE_NAMES.college, data.colleges);
+    for(let [key, tableName] of Object.entries(TABLE_NAMES)) {
+        await writeAllToTable(tableName, data[tableName]);
+    }
 }
 
 async function updateAllData(data) {
@@ -148,7 +165,7 @@ function validateDbJson(event) {
 
     const input = event.target;
     const status = document.querySelector(".import-status");
-    const importButton = document.getElementById("import-button");
+    const uploadOption = document.getElementById("upload-json");
     if("files" in input && input.files.length > 0) {
         const file = input.files[0];
         const reader = new FileReader();
@@ -157,11 +174,12 @@ function validateDbJson(event) {
             if(valid) {
                 status.style.color = "green";
                 status.innerText = "upload is valid";
-                importButton.removeAttribute("disabled");
+                uploadOption.removeAttribute("disabled");
             } else {
                 status.style.color = "red";
                 status.innerText = "upload is invalid";
-                importButton.setAttribute("disabled", "true");
+                uploadOption.setAttribute("disabled", "true");
+                uploadOption.checked = false;
             }
         }
 
@@ -169,7 +187,7 @@ function validateDbJson(event) {
     } else {
         status.style.color = "red";
         status.innerText = "no data uploaded";
-        importButton.setAttribute("disabled", "true");
+        uploadOption.setAttribute("disabled", "true");
     }
 
     document.getElementById("loading-indicator").style.display = "none";
@@ -191,27 +209,5 @@ function isDbJsonValid(e) {
     } catch(error) {
         console.log(error);
         return false;
-    }
-}
-
-async function importJsonToDb() {
-    const input = document.getElementById("import-file");
-    try {
-        const file = input.files[0];
-        const reader = new FileReader();
-        reader.onload = async function(e) {
-            const fileJson = e.target.result;
-            const fileObj = JSON.parse(fileJson);
-            const fileObjMap = Object.entries(fileObj);
-            for(let i = 0; i < fileObjMap.length; ++i) {
-                tableName = fileObjMap[i][0];
-                tableData = fileObjMap[i][1];
-                await writeAllToTable(tableName, tableData);
-            }
-        }
-
-        reader.readAsText(file, "UTF-8");
-    } catch(error) {
-        console.log(error);
     }
 }

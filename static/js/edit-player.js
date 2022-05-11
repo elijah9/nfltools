@@ -208,7 +208,9 @@ async function getAvailableJerseyNumbers(currentPlayer) {
 
 function getHeightOptions() {
     const options = {};
+    // allow 5-7 feet
     for(let i = 5; i < 8; ++i) {
+        // allow 0-11 inches
         for(let j = 0; j < 12; ++j) {
             const height = `${i}-${j}`;
             options[height] = height;

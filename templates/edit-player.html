@@ -5,15 +5,13 @@
 {% endblock %}
 
 {% block content %}
-    <h1>{{title}}</h1>
-
     <form id="edit-player-form" class="outline margin-top hidden needs-validation" novalidate>
         <input id="playerId" type="hidden" value="{{player_id}}" data-input-type="text">
         <a id="playersHref" class="hidden" href="{{ url_for('players', team='$team', position='$pos') }}"></a>
 
         <div id="form-rows"></div>
 
-        <div id="form-buttons" class="g-3 align-items-center margin-top">
+        <div id="form-buttons" class="g-3 center margin-top">
             <button type="submit" class="btn btn-primary col-auto margin-left">Submit</button>
             <button type="button" class="btn btn-dark col-auto margin-left" id="reset-button">Reset</button>
             <button type="button" class="btn btn-danger col-auto margin-left hidden" id="delete-button">Delete</button>

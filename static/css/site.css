@@ -119,3 +119,28 @@ form .row {
 .row-narrow {
     width: 30em;
 }
+
+.center {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.v-center {
+    display: flex;
+    align-items: center;
+}
+
+.h-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.center-text {
+    text-align: center;
+}
