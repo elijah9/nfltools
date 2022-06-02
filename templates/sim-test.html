@@ -9,8 +9,8 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ url_for('static', filename='js/relegation-sim.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/relegationSim.js') }}"></script>
     <script>
-        initRelegationSim();
+        relegationSim.default();
     </script>
 {% endblock %}

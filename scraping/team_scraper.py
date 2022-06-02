@@ -55,6 +55,7 @@ def scrape_team_players(team_code, year):
     return team_players
 
 # TODO: saints page does not contain retired numbers
+# TODO: include unique ID
 def scrape_retired_numbers(team_code):
     url = f"{PFR_BASE_URL}/teams/{team_code}/"
     html = requests.get(url)

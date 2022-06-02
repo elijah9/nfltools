@@ -1,14 +1,19 @@
-async function getDropdownOptions(tableName, keyId, valId) {
-    const allRows = await getAllFromTable(tableName);
-    const options = Object.assign({}, ...allRows.map(t => ({ [t[keyId]]: t[valId] })));
+import { TableName, getAllFromTable } from "./idb-utils"
+
+export async function getDropdownOptions(tableName : TableName, keyId : string, valId : string)
+    : Promise<{ [val : string] : string }> {
+
+    const allRows : any[] = await getAllFromTable(tableName.name);
+    const options : { [val : string] : string } 
+        = Object.assign({}, ...allRows.map(t => ({ [t[keyId]]: t[valId] })));
     return options;
 }
 
-function appendLabel(id, labelVal, row) {
-    const labelDiv = document.createElement("div");
+function appendLabel(id : string, labelVal : any, row : HTMLElement) {
+    const labelDiv : HTMLElement = document.createElement("div");
     labelDiv.className = "col-sm-5";
     
-    const label = document.createElement("label");
+    const label : HTMLLabelElement = document.createElement("label");
     label.htmlFor = id;
     label.className = "col-form-label";
     label.innerText = labelVal;
@@ -17,20 +22,22 @@ function appendLabel(id, labelVal, row) {
     row.appendChild(labelDiv);
 }
 
-function appendDropdownRow(form, obj, id, options, labelVal) {
-    const row = document.createElement("div");
+export function appendDropdownRow(form : HTMLElement, obj : object, id : string, 
+    options : { [val : string] : string }, labelVal : any) {
+
+    const row : HTMLElement = document.createElement("div");
     row.className = "row g-3 align-items-center";
 
     appendLabel(id, labelVal, row);
 
-    const inputDiv = document.createElement("div");
+    const inputDiv : HTMLElement = document.createElement("div");
     inputDiv.className = "col-sm-7";
 
-    const select = document.createElement("select");
+    const select : HTMLSelectElement = document.createElement("select");
     select.id = id;
     select.dataset.originalVal = obj[id];
     select.dataset.inputType = "dropdown";
-    select.classList = "form-select";
+    select.setAttribute("class", "form-select");
     select.required = true;
   
     replaceDropdownOptions(select, options, obj[id]);
@@ -41,14 +48,16 @@ function appendDropdownRow(form, obj, id, options, labelVal) {
 
     inputDiv.appendChild(select);
     row.appendChild(inputDiv);
-    row.classList += " row-narrow";
+    row.classList.add("row-narrow");
     form.appendChild(row);
 }
 
-function replaceDropdownOptions(select, options, currentVal) {
+export function replaceDropdownOptions(select : HTMLSelectElement, 
+    options : { [val : string] : string }, currentVal : any) {
+
     select.innerHTML = "";
     for(let [optionValue, optionText] of Object.entries(options)) {
-        const option = document.createElement("option");
+        const option : HTMLOptionElement = document.createElement("option");
         option.value = optionValue;
         option.innerText = optionText;
         if(optionValue == currentVal) {
@@ -58,15 +67,15 @@ function replaceDropdownOptions(select, options, currentVal) {
     }
 }
 
-function appendInputRow(form, obj, id, type, labelVal="") {
-    const input = document.createElement("input");
+function appendInputRow(form : HTMLElement, obj : object, id : string, type : string, labelVal : string = "") {
+    const input : HTMLInputElement = document.createElement("input");
     input.type = type;
     input.id = id;
     input.dataset.originalVal = obj[id];
     input.dataset.inputType = type;
     input.required = true;
 
-    let row;
+    let row : HTMLElement;
     if(type === "hidden") {
         input.value = obj[id];
         row = input;
@@ -76,9 +85,9 @@ function appendInputRow(form, obj, id, type, labelVal="") {
 
         appendLabel(id, labelVal, row);
 
-        const inputDiv = document.createElement("div");
+        const inputDiv : HTMLElement = document.createElement("div");
         inputDiv.className = "col-sm-7";
-        input.classList = "form-control";
+        input.setAttribute("class", "form-control");
         if(type === "date") {
             input.type = "text";
             input.dataset.provide = "datepicker";
@@ -93,22 +102,22 @@ function appendInputRow(form, obj, id, type, labelVal="") {
         row.appendChild(inputDiv);
     }
     
-    row.classList += " row-narrow";
+    row.classList.add("row-narrow");
     form.appendChild(row);
 }
 
-function appendTextRow(form, obj, id, labelVal) {
+export function appendTextRow(form : HTMLElement, obj : object, id : string, labelVal : string) {
     appendInputRow(form, obj, id, "text", labelVal);
 }
 
-function appendHiddenRow(form, obj, id) {
+export function appendHiddenRow(form : HTMLElement, obj : object, id : string) {
     appendInputRow(form, obj, id, "hidden");
 }
 
-function appendNumberRow(form, obj, id, labelVal) {
+export function appendNumberRow(form : HTMLElement, obj : object, id : string, labelVal : string) {
     appendInputRow(form, obj, id, "number", labelVal);
 }
 
-function appendDateRow(form, obj, id, labelVal) {
+export function appendDateRow(form : HTMLElement, obj : object, id : string, labelVal : string) {
     appendInputRow(form, obj, id, "date", labelVal);
 }

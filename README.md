@@ -4,8 +4,10 @@ Flask app which ideally should replace everything I currently do in a spreadshee
 Currently hosted at http://twinprincess.pythonanywhere.com/, but the scraping doesn't work from there (at least it can be somewhat useful still with JSON imports). I probably won't be very proactive about pulling code updates to the server.
 
 ## To do
+- Convert to TypeScript
+  - Exclude JS files from source control
 - Scraper
-  - Allow user to filter JSON download, possibly also upload
+  - Allow user to filter scrape/upload
     - Table
     - Team
 - List views and edit ability for remaining tables
@@ -36,6 +38,13 @@ Currently hosted at http://twinprincess.pythonanywhere.com/, but the scraping do
 - (semi?) Automatically generate rated rosters from PFR data by scaling archetypes by PFR AV ratings
   - Could be fully automatic, albeit unlikely to closely reflect reality, if the only archetypes were tied to PFR positions
   - Would only be able to use AV data from completed seasons, but maybe sports-reference has college AV data
+  - Random ideas to generate ratings from available data:
+    - Use team stats to determine base level of success for players in a team's position group
+    - Assume that more playing time tracks positively with being rated higher than position players who play comparatively less
+    - Therefore, individual player rating would be the aggregate of weighted metrics:
+      - Team stats
+      - Playing time relative to teammates at same position
+      - Individual stats (maybe normalized by playing time)
 - UI to edit ratings, maybe even customize which attributes exist and how they contribute to overall rating for each position
   - This could be used to make it a generic roster editor for any football game like Madden, 2k5, Front Office Football (RIP to the latter two series)
 - Numeric ratings system:

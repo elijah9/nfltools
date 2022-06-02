@@ -9,24 +9,26 @@
  * @param {string} colType String representing data type of column
  * @param {boolean} asc Determines if the sorting will be in ascending
  */
- function sortTableByColumn(table, column, colType = "str", asc = true) {
-    const dirModifier = asc ? 1 : -1;
-    const tBody = table.tBodies[0];
-    const rows = Array.from(tBody.querySelectorAll("tr"));
+ function sortTableByColumn(table : HTMLTableElement, column : number, 
+    colType : string = "str", asc : boolean = true) {
+
+    const dirModifier : number = asc ? 1 : -1;
+    const tBody : HTMLTableSectionElement = table.tBodies[0];
+    const rows : HTMLTableRowElement[] = Array.from(tBody.querySelectorAll("tr"));
 
     // Sort each row
-    const sortedRows = rows.sort((a, b) => {
-        const aColText = a.querySelector(`td:nth-child(${ column + 1 })`).textContent.trim();
-        const bColText = b.querySelector(`td:nth-child(${ column + 1 })`).textContent.trim();
+    const sortedRows : HTMLTableRowElement[] = rows.sort((a : HTMLTableRowElement, b : HTMLTableRowElement) => {
+        const aColText : string = a.querySelector(`td:nth-child(${ column + 1 })`).textContent.trim();
+        const bColText : string = b.querySelector(`td:nth-child(${ column + 1 })`).textContent.trim();
 
-        let comparison;
+        let comparison : boolean;
         switch(colType) {
             case "str":
                 comparison = aColText > bColText
                 break;
             case "int":
-                const aInt = parseInt(aColText);
-                const bInt = parseInt(bColText);
+                const aInt : number = parseInt(aColText);
+                const bInt : number = parseInt(bColText);
                 if(isNaN(aInt) && !isNaN(bInt)) {
                     comparison = false;
                 } else if(!isNaN(aInt) && isNaN(bInt)) {
@@ -38,8 +40,9 @@
                 }
                 break;
             case "date":
-                const isValidDate = function(d) {
-                    return d instanceof Date && !isNaN(d);
+                const isValidDate = function(d : any) : boolean {
+                    const isDate : boolean = d instanceof Date;
+                    return isDate && !isNaN(d);
                 };
                 const aDate = new Date(aColText);
                 const bDate = new Date(bColText);
@@ -54,19 +57,19 @@
                 }
                 break;
             case "height":
-                const isValidHeight = function(h, feet, inches) {
+                const isValidHeight = function(h : string[], feet : number, inches : number) : boolean {
                     if(h.length == 2) {
                         return !isNaN(feet) && !isNaN(inches);
                     }
                     return false;
                 }
                 
-                const aSplit = aColText.split("-");
-                const aFeet = parseInt(aSplit[0]);
-                const aInches = parseInt(aSplit[1]);
-                const bSplit = bColText.split("-");
-                const bFeet = parseInt(bSplit[0]);
-                const bInches = parseInt(bSplit[1]);
+                const aSplit : string[] = aColText.split("-");
+                const aFeet : number = parseInt(aSplit[0]);
+                const aInches : number = parseInt(aSplit[1]);
+                const bSplit : string[] = bColText.split("-");
+                const bFeet : number = parseInt(bSplit[0]);
+                const bInches : number = parseInt(bSplit[1]);
                 if(!isValidHeight(aSplit, aFeet, aInches) && isValidHeight(bSplit, bFeet, bInches)) {
                     comparison = false;
                 } else if(isValidHeight(aSplit, aFeet, aInches) && !isValidHeight(bSplit, bFeet, bInches)) {
@@ -102,12 +105,12 @@
     table.querySelector(`th:nth-child(${ column + 1})`).classList.toggle("th-sort-desc", !asc);
 }
 
-document.querySelectorAll(".table-sortable th").forEach(headerCell => {
+document.querySelectorAll(".table-sortable th").forEach((headerCell : HTMLElement) => {
     headerCell.addEventListener("click", () => {
-        const tableElement = headerCell.parentElement.parentElement.parentElement;
-        const headerIndex = Array.prototype.indexOf.call(headerCell.parentElement.children, headerCell);
-        const colType = headerCell.dataset.colType;
-        const currentIsAscending = headerCell.classList.contains("th-sort-asc");
+        const tableElement = <HTMLTableElement>(headerCell.parentElement.parentElement.parentElement);
+        const headerIndex : number = Array.prototype.indexOf.call(headerCell.parentElement.children, headerCell);
+        const colType : string = headerCell.dataset.colType;
+        const currentIsAscending : boolean = headerCell.classList.contains("th-sort-asc");
 
         sortTableByColumn(tableElement, headerIndex, colType, !currentIsAscending);
     });

@@ -37,7 +37,7 @@ def convert_pfr_position(pfr_pos):
 
     if p == "QB":
         return "QB"
-    elif p == "RB":
+    elif p in ["RB", "HB"]:
         return "RB"
     elif p == "FB":
         return "FB"

@@ -37,8 +37,8 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ url_for('static', filename='js/edit-player.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/editPlayer.js') }}"></script>
     <script>
-        showLoadingIndicator(initEditPlayer);
+        editPlayer.default();
     </script>
 {% endblock %}
