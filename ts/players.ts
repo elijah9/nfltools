@@ -75,6 +75,7 @@ async function resetPlayersTable() {
 
     const allPlayers : Player[] = await getAllFromTable(TABLE_NAMES.player.name);
     const allPlayerTeams : PlayerTeam[] = await getAllFromTable(TABLE_NAMES.playerTeams.name);
+
     for(let i = 0; i < allPlayers.length; ++i) {
         const player : Player = allPlayers[i];
         const playerTeam : PlayerTeam = allPlayerTeams.filter(function (pt : PlayerTeam) {

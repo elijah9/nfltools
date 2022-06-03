@@ -13,7 +13,7 @@ export class Player {
     playerId : string;
     lastName : string;
     firstName : string;
-    jerseyNumber : number;
+    jerseyNumber : string;
     position : string;
     height : string;
     weight : number;
@@ -46,7 +46,7 @@ export type PlayerTeam = {
 
 export type RetiredNumber = {
     teamCode : string;
-    jerseyNumber : number;
+    jerseyNumber : string;
     playerName : string;
 };
 

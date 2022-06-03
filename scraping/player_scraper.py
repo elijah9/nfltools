@@ -10,7 +10,7 @@ def scrape_player(row_soup, year):
     birth_date = row_soup.select('td[data-stat="birth_date_mod"]')[0].text
     experience = row_soup.select('td[data-stat="experience"]')[0].text
     av_rating = row_soup.select('td[data-stat="av"]')[0].text
-    # print(f"{position} #{jersey_number} - {first_name} {last_name} - {height} {weight} - {college} - {birth_date} ({experience}) - {year} AV: {av_rating}")
+    # print(f"{position} #{jersey_number} - {first_name} {last_name} - {height} {weight} - {college_id} - {birth_date} ({experience}) - {year} AV: {av_rating}")
 
     # only use last college
     colleges = college_id.split(",")

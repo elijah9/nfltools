@@ -31,7 +31,7 @@ export function downloadFile(filename : string, content : string) {
     document.body.removeChild(link);
 }
 
-function getTodayStr() : string {
+export function getTodayStr() : string {
     let today = new Date();
     const offset : number = today.getTimezoneOffset();
     today = new Date(today.getTime() - (offset*60*1000));

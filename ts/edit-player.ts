@@ -191,7 +191,7 @@ async function getAvailableJerseyNumbers(currentPlayer : AssignablePlayer)
     const allPlayers : Player[] = await getAllFromTable(TABLE_NAMES.player.name);
     const teamPlayers : PlayerTeam[] = await getAllFromTable(TABLE_NAMES.playerTeams.name, { teamCode: currentPlayer.teamCode });
     const retiredNumbers : RetiredNumber[] = await getAllFromTable(TABLE_NAMES.retiredNumbers.name, { teamCode: currentPlayer.teamCode });
-    const takenNumbers : number[] = [];
+    const takenNumbers : string[] = [];
     for(let i = 0; i < teamPlayers.length; ++i) {
         const player : Player = allPlayers.filter(function (p : Player) {
             return p.playerId === teamPlayers[i].playerId;
@@ -201,8 +201,7 @@ async function getAvailableJerseyNumbers(currentPlayer : AssignablePlayer)
         })[0].unit;
 
         // check if player's jersey number is blank
-        // TODO: test this after typescript conversion
-        if(player.jerseyNumber == null
+        if(isEmptyOrSpaces(player.jerseyNumber.toString())
             // otherwise, allow if the edited player already has this number
             || player.jerseyNumber === currentPlayer.jerseyNumber 
             // also allow if player is on a different unit
@@ -211,13 +210,14 @@ async function getAvailableJerseyNumbers(currentPlayer : AssignablePlayer)
         }
         takenNumbers.push(player.jerseyNumber);
     }
+
     for(let i = 0; i < retiredNumbers.length; ++i) {
         takenNumbers.push(retiredNumbers[i].jerseyNumber);
     }
 
     const availableNumbers : { [id : string] : string } = {};
     for(let i = 1; i < 100; ++i) {
-        if(!takenNumbers.includes(i)) {
+        if(!takenNumbers.includes(i.toString())) {
             availableNumbers[i.toString()] = i.toString();
         }
     }

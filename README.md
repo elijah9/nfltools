@@ -4,8 +4,6 @@ Flask app which ideally should replace everything I currently do in a spreadshee
 Currently hosted at http://twinprincess.pythonanywhere.com/, but the scraping doesn't work from there (at least it can be somewhat useful still with JSON imports). I probably won't be very proactive about pulling code updates to the server.
 
 ## To do
-- Convert to TypeScript
-  - Exclude JS files from source control
 - Scraper
   - Allow user to filter scrape/upload
     - Table
